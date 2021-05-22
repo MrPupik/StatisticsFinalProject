@@ -1,0 +1,73 @@
+---
+title: "fake news study"
+output: html_document
+---
+
+## intro and data exploreation
+
+the data is from kaggle. ([view here](https://www.kaggle.com/clmentbisaillon/fake-and-real-news-dataset) )
+  
+it contains two csv files, *Fake.csv* and *True.csv*.  
+first i explored the data: 
+
+```{r setup, include=FALSE}
+library(tidyverse)
+fake = readr::read_csv(file="C:/tmp/Fake.csv")
+true = readr::read_csv(file="C:/tmp/True.csv")
+
+```
+
+
+```{r exploration, include=TRUE}
+
+glimpse(true) # glimpse true news
+glimpse(fake) # glimpse fake news
+
+```
+
+### issue: subject mismatch
+
+i decided to examine if subject is related to fake or true.  
+however, i discoverd that the subjects are not the same between the two data sets.  
+we are going to have to combine the data sets somehow.
+
+```{r subjects, include=TRUE}
+true %>% count(subject)
+fake %>% count(subject)
+
+```
+
+
+## compering between subjects
+
+```{r helper_func, include=FALSE}
+
+minmize_subjects <- Vectorize(function(sub) {
+  if (sub %in% c("politics", "politicsNews"))
+  {
+    return("politics")
+  }
+  else{
+    return("non-politics")
+  }
+}
+)
+```
+
+
+so we are going to   
+1. **combine the data sets**  
+2. **then clean up the subjects**  
+we will divie the subjects up into two main ones: politics and non-politics.
+
+```{r compare_subject, include=TRUE}
+fake = fake %>% mutate(true = 0)
+true = true %>% mutate(true = 1)
+
+data = bind_rows(true, fake) %>% mutate(subject = minmize_subjects(subject))
+data %>% count(subject, true)
+
+```
+
+
+thank you, bye.
