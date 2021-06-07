@@ -171,3 +171,9 @@ ggplot((data20 %>% filter(isWest == "rest of the world") %>%
        (aes(sample=`Ladder score`))) + geom_qq() + geom_qq_line(color="cyan4") + labs(title="QQ Plot - west countries")
 
 
+# השואאה בין 2020 ל 2019
+pretty_colors = ifelse(names =="2020" , rgb(0.1,0.1,0.7,0.5) , 
+                       ifelse(names =="2019", rgb(0.8,0.1,0.3,0.6) ) )
+ggplot(happ1920, aes(x=factor(year), y=Score, fill=year)) + geom_boxplot() + scale_fill_brewer(palette="Dark2")
+boxplot(data19$Score, data20$`Ladder score`, names = c("2019", "2020"), col =  rgb(0.8,0.1,0.3,0.6) , 
+        ylab="happiness score" , xlab="- year -")

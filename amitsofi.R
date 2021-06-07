@@ -1,4 +1,5 @@
 library(tidyverse)
+library(wesanderson)
 
 #data collect: 
 data19 = readr::read_csv(file="data/2019.csv")
@@ -15,13 +16,18 @@ happ19 = data19 %>% sample_n(150) %>% select(Score) %>% mutate(year = 2019)
 happ20 = data20 %>% sample_n(150) %>% select(`Ladder score`) %>% mutate(year = 2020) %>% rename(Score = `Ladder score`)
 happ1920 = bind_rows(happ19, happ20)
 
-# lets look at the findings in this boxplot:
-boxplot(data19$Score, data20$`Ladder score`, names = c("2019", "2020"))
+# lets look at the findings in this boxplots:
+
+happ1920 %>% ggplot(aes(y= Score, x=factor(year) ,fill=(year)), color = year) + geom_boxplot() +
+  ggtitle("Corona Happiness 2019 and 2020") + xlab("year") + theme(legend.position="none") 
+
+###### i cant change the colors !!!!
+
 
 # and lets make a t-test:
 t.test(formula = happ1920$Score ~ happ1920$year, data = happ1920, alternative = "greater")
 
-# conclusion: becase the p-value is .... we are going to ....
+# conclusion: because the p-value is .... we are going to ....
 # we can see that not only that 2019 wasn't happier than 2020, but that 2020 was even happier than 2019.
 
 
@@ -32,8 +38,10 @@ t.test(formula = happ1920$Score ~ happ1920$year, data = happ1920, alternative = 
 by_reg = data20 %>% select(`Regional indicator`, `Ladder score`)
 mean_by_reg = aggregate(by_reg[2], list(by_reg$`Regional indicator`), mean)  %>% rename(Continent = Group.1)
 
-# now lets view the data:
-ggplot(mean_by_reg, aes(Continent, `Ladder score`)) + geom_col() + theme(axis.text.x=element_text(angle=45, hjust=1))
+# now lets view the data: 
+ggplot(mean_by_reg, aes(Continent, `Ladder score`)) + geom_col(aes(fill = Continent), width = 0.7) +
+  ggtitle("Happiness Score By Area") + theme(legend.position="none") + 
+  theme(axis.text.x=element_text(angle=45, hjust=1)) 
 
 # lets make a chi test, to see if we can assume normal distribution at the world happiness score:
 interval_breaks = c(0, 1, 2, 3, 4, 5, 6, 7) # אולי להקטין את האינטרוולים בלי 0-1
@@ -74,33 +82,40 @@ data20 = data20 %>% mutate(isWest = ifelse(`Regional indicator` %in% c("Western 
 
 # after that we decided to look again at the distribution graphs: 
 # density of the west world:
-ggplot((data20 %>% filter(isWest == "west world country")), aes(`Ladder score`)) + geom_density()
+ggplot((data20 %>% filter(isWest == "west world countries")), aes(`Ladder score`)) + geom_density() + 
+  ggtitle("west world countries")
 # looks very normal!
 # density of the rest of the world:
-ggplot((data20 %>% filter(isWest == "rest of the world")),  aes(`Ladder score`)) + geom_density()
+ggplot((data20 %>% filter(isWest == "rest of the world")),  aes(`Ladder score`)) + geom_density() +
+  ggtitle("non west world countries")
 # we can see that its still not very normal, we filtered the Latin America and Caribbean countries to help 
 # our data to look more normal
 ggplot((data20 %>% filter(isWest == "rest of the world") %>% filter(!(`Regional indicator` == "Latin America and Caribbean")))
-       , aes(`Ladder score`)) + geom_density()
+       , aes(`Ladder score`)) + geom_density() + ggtitle("non west world countries")
 # now its better :)
 
 # so we got two graphs that looks pretty normal. 
 # lets test it in a QQ test:
-#west countries:
-qqnorm((data20 %>% filter(isWest == "west world country"))$`Ladder score`, pch = 1, frame = FALSE)
+#QQ test for the west countries:
+qqnorm((data20 %>% filter(isWest == "west world country"))$`Ladder score`, pch = 1, frame = FALSE,
+       main = "Normal QQ Plot - west countries ")
 qqline((data20 %>% filter(isWest == "west world country"))$`Ladder score`, col = "steelblue", lwd = 2)
-#rest of the world:
+#QQ test for the rest of the world:
 qqnorm((data20 %>% filter(isWest == "rest of the world") %>% 
-          filter(!(`Regional indicator` == "Latin America and Caribbean")))$`Ladder score`, pch = 1, frame = FALSE)
+          filter(!(`Regional indicator` == "Latin America and Caribbean")))$`Ladder score`, pch = 1, frame = FALSE,
+       main = "Normal QQ Plot - non west countries ")
 qqline((data20 %>% filter(isWest == "rest of the world") %>% 
          filter(!(`Regional indicator` == "Latin America and Caribbean")))$`Ladder score`, col = "steelblue", lwd = 2)
 
+# as we can see, this isn't perfectly normal, but for our research it's good enough. 
+# we just need to understand that the results we are going to have are not exactly right
 # to confirm our assumption, we will make a test of hefresh tohalot:
 #lets look at the data
 data20 %>% filter(!(`Regional indicator` == "Latin America and Caribbean")) %>%
   ggplot(aes(y=`Ladder score`, x=factor(isWest) ,fill=(isWest)))  + geom_boxplot() # + geom_point()
 
 # to make the t-test we would like to take the same length of the data
+
 ######## PROBLEM 
 # it is not working :( i wanted to count the number of countries of the west  and all the others to show that
 # its not the same and we need to take a sample from the "else" cpuntries
