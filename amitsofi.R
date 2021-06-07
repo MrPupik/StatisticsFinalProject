@@ -40,7 +40,7 @@ mean_by_reg = aggregate(by_reg[2], list(by_reg$`Regional indicator`), mean)  %>%
 # now lets view the data: , fill="seagreen"
 ggplot(mean_by_reg, aes(Continent, `Ladder score`)) + geom_col(aes(fill = Continent), width = 0.7) +
   ggtitle("Happiness Score By Area") + theme(legend.position="none") + 
-  theme(axis.text.x=element_text(angle=45, hjust=1))
+  theme(axis.text.x=element_text(angle=45, hjust=1))+ylab("Score")
 
 
 # lets make a chi test, to see if we can assume normal distribution at the world happiness score:
