@@ -111,7 +111,8 @@ qqline((data20 %>% filter(isWest == "rest of the world") %>%
 # to confirm our assumption, we will make a test of hefresh tohalot:
 #lets look at the data
 data20 %>% filter(!(`Regional indicator` == "Latin America and Caribbean")) %>%
-  ggplot(aes(y=`Ladder score`, x=factor(isWest) ,fill=(isWest)))  + geom_boxplot() # + geom_point()
+  ggplot(aes(y=`Ladder score`, x=factor(isWest) ,fill=(isWest), width = 0.5))  + geom_boxplot() +
+  theme(legend.position="none", axis.text.x = element_text(color = "black", size = 15 )) + xlab("") + ylab("Score")# + geom_point()
 
 # to make the t-test we would like to take the same length of the data
 
