@@ -39,7 +39,7 @@ happ19 = data19 %>% sample_n(150) %>% select(Score) %>% mutate(year = 2019)
 happ20 = data20 %>% sample_n(150) %>% select(`Ladder score`) %>% mutate(year = 2020) %>% rename(Score = `Ladder score`)
 happ1920 = bind_rows(happ19, happ20)
 
-# making a t test to the data, we found that not only that 2019 wastnt happier than 2020 - but 2020 was even happier than 2019.
+# making a t test to the data, we found that not only that 2019 wasnt happier than 2020 - but 2020 was even happier than 2019.
 
 t.test(formula = happ1920$Score ~ happ1920$year, data = happ1920, alternative = "greater")
 
@@ -60,14 +60,14 @@ lm(formula =data18$Score ~ data18$`GDP per capita` ,data=data18)
 #at first, we took only the data of the area and the score.we took the mean of each area and placed the means in a new table.
 
 by_reg = data20 %>% select(`Regional indicator`, `Ladder score`)
-#view(by_reg)
+view(by_reg)
 mean_by_reg = aggregate(by_reg[2], list(by_reg$`Regional indicator`), mean)  %>% rename(Continent = Group.1)
-#view(mean_by_reg)
+view(mean_by_reg)
 
 # now lets take the data and view it:
-ggplot(try, aes(`Ladder score`, Continent)) + geom_col()
+ggplot(mean_by_reg, aes(`Ladder score`, Continent)) + geom_col()
 # אם מצליחים לסובב את השמות של היבשות בציר האיקס אז הגרף הזה יותר טוב
-ggplot(try, aes(Continent, `Ladder score`)) + geom_col()
+ggplot(mean_by_reg, aes(Continent, `Ladder score`)) + geom_col() + theme(axis.text.x=element_text(angle=45, hjust=1))
 
 
 # אני לא יודעת מה אלו 
@@ -114,17 +114,60 @@ qchisq(p = 1-0.05, df = 7-2-1)
 ggplot(data20, aes(`Ladder score`)) + geom_density()
 
 # ניראה קצת כמו חיבור של 2 התפלגויוצ נורמליות.. בוא נפריד את הדאטה למדינות מערביות ולכל השאר, ונסתכל על הגרפים של הם:
+# ניקח
 
-data_west = data20 %>% filter(`Regional indicator` %in% c("Western Europe", 
-                                                          "North America and ANZ"))
-data_else = data20 %>% filter(!(`Regional indicator` %in% c("Western Europe", 
-                                                            "North America and ANZ", "Latin America and Caribbean")))
-ggplot(data_west, aes(`Ladder score`)) + geom_density()
-ggplot(data_else, aes(`Ladder score`)) + geom_density()
+data20 = data20 %>% mutate(isWest = ifelse(`Regional indicator` %in% c("Western Europe", 
+                                                          "North America and ANZ") ,
+                                           "west world country" , "rest of the world"))
+                           
+#view(data20)
 
-data_west %>% count() #25
-data_else %>% count() #107
+#data_else = data20 %>% filter(!(`Regional indicator` %in% c("Western Europe", 
+#                                                           "North America and ANZ", "Latin America and Caribbean"))) # %>% sample_n(25)
+
+
+ggplot((data20 %>% filter(isWest == "west world country")), aes(`Ladder score`)) + geom_density()
+ggplot((data20 %>% filter(isWest == "rest of the world") %>% filter(!(`Regional indicator` == "Latin America and Caribbean")))
+       , aes(`Ladder score`)) + geom_density()
+
+#data_west %>% count() #25
+#data_else %>% count() #107
 
 # הגרפים ניראים די דומה להתפלגות נורמלית, איזה התפלגות אפשר להניח?
 # נעשה מבחן הפקש תוחלות ואז נוכל להראות שאם אתה גר במדינה מערבית אתה שמח יותר
+
+data20 %>% filter(!(`Regional indicator` == "Latin America and Caribbean")) %>%
+  ggplot(aes(y=`Ladder score`, x=factor(isWest) ,fill=(isWest)))  + geom_boxplot() +geom_jitter(width=0.15)
+
+# זה סבבה שצימצמתי את האוכלוסייה ל25 במקום 107 כדי לסדר את זה
+
+t.test(x = (data20 %>% filter(isWest == "west world country"))$`Ladder score`,
+       y = ((data20 %>% filter(isWest == "rest of the world") %>% filter(!(`Regional indicator` == "Latin America and Caribbean")))
+             %>% sample_n(25))$`Ladder score`,
+       paired = TRUE, alternative = "greater")
+
+########### thats the end
+
+myColors <- ifelse(levels(data$names)=="west world contries" , rgb(0.1,0.1,0.7,0.5) , 
+                   ifelse(levels(data$names)=="rest of the world", rgb(0.8,0.1,0.3,0.6)))
+
+
+boxplot(data_west$`Ladder score`, data_else$`Ladder score`,
+        names = c("west world contries", "rest of the world"), col= rgb(1, 0, 0, alpha = 0.4) ) 
+
+
+
+#boxplot(data_west$`Ladder score`, data_else$`Ladder score`,
+#        names = c("west world contries", "rest of the world"), fill = ) 
+
+# QQ test to the differents area 
+
+ggplot((data20 %>% filter(isWest == "rest of the world") %>% 
+          filter(!(`Regional indicator` == "Latin America and Caribbean"))),
+       (aes(sample=`Ladder score`))) + geom_qq() + geom_qq_line(color="cyan4") + labs(title="QQ Plot - west countries")
+
+ggplot((data20 %>% filter(isWest == "rest of the world") %>% 
+          filter(!(`Regional indicator` == "Latin America and Caribbean"))),
+       (aes(sample=`Ladder score`))) + geom_qq() + geom_qq_line(color="cyan4") + labs(title="QQ Plot - west countries")
+
 
