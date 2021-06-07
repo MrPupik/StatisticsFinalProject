@@ -1,5 +1,4 @@
 library(tidyverse)
-library(wesanderson)
 
 #data collect: 
 data19 = readr::read_csv(file="data/2019.csv")
@@ -82,9 +81,9 @@ data20 = data20 %>% mutate(isWest = ifelse(`Regional indicator` %in% c("Western 
 
 # after that we decided to look again at the distribution graphs: 
 # density of the west world:
-ggplot((data20 %>% filter(isWest == "west world countries")), aes(`Ladder score`)) + geom_density() + 
+ggplot((data20 %>% filter(isWest == "west world country")), aes(`Ladder score`)) + geom_density() + 
   ggtitle("west world countries")
-# looks very normal!
+# looks pretty normal!
 # density of the rest of the world:
 ggplot((data20 %>% filter(isWest == "rest of the world")),  aes(`Ladder score`)) + geom_density() +
   ggtitle("non west world countries")
