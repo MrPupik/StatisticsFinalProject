@@ -37,10 +37,11 @@ t.test(formula = happ1920$Score ~ happ1920$year, data = happ1920, alternative = 
 by_reg = data20 %>% select(`Regional indicator`, `Ladder score`)
 mean_by_reg = aggregate(by_reg[2], list(by_reg$`Regional indicator`), mean)  %>% rename(Continent = Group.1)
 
-# now lets view the data: 
+# now lets view the data: , fill="seagreen"
 ggplot(mean_by_reg, aes(Continent, `Ladder score`)) + geom_col(aes(fill = Continent), width = 0.7) +
   ggtitle("Happiness Score By Area") + theme(legend.position="none") + 
-  theme(axis.text.x=element_text(angle=45, hjust=1)) 
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+
 
 # lets make a chi test, to see if we can assume normal distribution at the world happiness score:
 interval_breaks = c(0, 1, 2, 3, 4, 5, 6, 7) # אולי להקטין את האינטרוולים בלי 0-1
@@ -67,13 +68,15 @@ chi2_0
 #table value:
 qchisq(p = 1-0.05, df = 7-2-1)
 
-# we got a greater value than our table value, so we are going to reject the assumption that 
-# the world happiness distribution isn't normal.
-# looking at the distribution graph, we noticed that it looks like two normal distributions combaind together. 
+# we got a greater value than our table value, it means we are going to reject the assumption that 
+# the world happiness distribution is normal.
+# looking at the distribution graph, we noticed that it looks like two normal distributions combined together. 
 ggplot(data20, aes(`Ladder score`)) + geom_density()
 
-# so we decided to check it. we assumed that the area of the country effects the happiness score of the country.
-# we added a new column to our data table, distinguishing between west world countries
+# we decided to check it. as you can see in the Happiness Score By Area plot, the average score of the 
+# western countries, is much higher than the others.we assumed that the area of the country effects the
+# happiness score of the country.
+# to check it, we added a new column to our data table, distinguishing between west world countries
 #(Western Europe and North America and ANZ), and the rest of the world.
 
 data20 = data20 %>% mutate(isWest = ifelse(`Regional indicator` %in% c("Western Europe", "North America and ANZ") 
