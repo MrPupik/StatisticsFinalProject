@@ -1,16 +1,18 @@
 ---
-title: 
+title:
 output: html_document
 css: "BTS.css"
-editor_options: 
-  markdown: 
+editor_options:
+  markdown:
     wrap: 72
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
 >
+
 <div class="headstrip">
   <div style="margin: 10px; padding-left: 20px;">
     <p class="mainTitle" style=" display: inline-block; width: 50%; font-size: xx-large; color: whitesmoke">World Happiness Analysis</p>
@@ -21,9 +23,7 @@ knitr::opts_chunk$set(echo = TRUE)
  > 
 </div>
 
-
->
-<img src="resources/stairs.jpg"/>
+> <img src="resources/stairs.jpg"/>
 
 ## <span style="color: #6600ff"> Introduction: </span>
 
@@ -38,22 +38,20 @@ Since the data of each year came separately, and included different
 categories and measurements - the first stage of our work is to **tidy
 our data**. Make it ready to be worked on.
 
-**Note**: When we first introduce a variable and how we will adress it in this article, we will do so by the following structre: `varible` (*our term*)
-for example, `happiness score` (*score*)
+**Note**: When we first introduce a variable and how we will adress it in this article, we will do so by the following structre: `varible` (_our term_)
+for example, `happiness score` (_score_)
 
-The next two stages are the heart of our article: <u> Visualization and modeling.</u> 
-We'll be Waking visualizations to explore the data, theorize about what we see, and  proove/disproove our theories using statistical models and methods we learned throught the course.
+The next two stages are the heart of our article: <u> Visualization and modeling.</u>
+We'll be Waking visualizations to explore the data, theorize about what we see, and proove/disproove our theories using statistical models and methods we learned throught the course.
 
 Our goal is to explore interesting facts of world happiness, what affects it and how.
-We will focus on:  
+We will focus on:
 
-#### 1. Why are some countries happier than others? What makes a country "happy"  
+#### 1. Why are some countries happier than others? What makes a country "happy"
 
-  - Connection between `life expectancy` (*health*) and *score*. Specificity, is the connection linear?  
-  - connection between `GDP per capita` (*gdp*) and happiness  
-  - connection between the `region or continent` (*region*) and happiness   
-  
-
+- Connection between `life expectancy` (_health_) and _score_. Specificity, is the connection linear?
+- connection between `GDP per capita` (_gdp_) and happiness
+- connection between the `region or continent` (_region_) and happiness
 
 ## Introduction {.tabset}
 
