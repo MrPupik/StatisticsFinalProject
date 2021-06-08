@@ -12,7 +12,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 >
-
 <div class="headstrip">
   <div style="margin: 10px; padding-left: 20px;">
     <p class="mainTitle" style=" display: inline-block; width: 50%; font-size: xx-large; color: whitesmoke">World Happiness Analysis</p>
@@ -44,16 +43,25 @@ for example, `happiness score` (_score_)
 The next two stages are the heart of our article: <u> Visualization and modeling.</u>
 We'll be Waking visualizations to explore the data, theorize about what we see, and proove/disproove our theories using statistical models and methods we learned throught the course.
 
-Our goal is to explore interesting facts of world happiness, what affects it and how.
-We will focus on:
+Our goal is to explore interesting facts of world happiness, what affects it and how. 
+Questions we will focus on:
 
-#### 1. Why are some countries happier than others? What makes a country "happy"
+#### 1. Why are some countries happier than others? What makes a country "happy"?
 
 - Connection between `life expectancy` (_health_) and _score_. Specificity, is the connection linear?
-- connection between `GDP per capita` (_gdp_) and happiness
-- connection between the `region or continent` (_region_) and happiness
+- Connection between the `region or continent` (_region_) and happiness
+- <span style="color: red">multiple regression on everything yay</span>
 
-## Introduction {.tabset}
+#### 2.happiens over the years  
+
+- Did Covid19 made the world sad? comparison of 2019 and 2020 *scores*  
+- Which year was the happiest? mean *score* over time.  
+- Connection between `GDP per capita` (_gdp_) and happiness - all years combined.
+- Are we getting happier ? trends in mean *score* over the years.  
+- Changes in happiness per country. Which countries changes the most?  
+
+
+## Stage 0: data exploreation and tidying {.tabset}
 
 ### la la la
 
