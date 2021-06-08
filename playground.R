@@ -73,9 +73,9 @@ for (i in c(1:length(AllData))) {
  some_data = some_data %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
 #   filter(data15, Country == "Israel") %>% mutate(year=2015)
 
- 
-entire_data %>% ggplot(aes(x=gdp, y=score, color=year))  + geom_point() # gdp - all
-some_data %>% ggplot(aes(x=gdp, y=score, color=year, shape=factor(isIsrael)))  + geom_point() # gdp - some data
+ entire_data %>% ggplot(aes(x=gdp, y=score, color=year))  + geom_point() # gdp - all
+
+some_data %>% ggplot(aes(x=gdp, y=score, color=year, shape=factor(isIsrael)))  + geom_point(size=3) # gdp - some data
 AllData[[7]] %>% ggplot(aes(x=gdp, y=score, color=year))  + geom_point() # gdp - only 21
 some_data %>% ggplot(aes(y=score, x=factor(year) ,fill=year))  + geom_boxplot() # boxplot - compare var and mean
 
@@ -88,7 +88,7 @@ View(AllData[[6]])
 # ggplot(data, aes(x=))
 
  entire_data %>% ggplot(aes(y=score, x=year))  + geom_boxplot()
- some_data %>% ggplot(aes(y=score, x=year))  + geom_boxplot()
+ some_data %>% ggplot(aes(y=score, x=year,color=qsec))  + geom_boxplot()
  
  
 
@@ -127,12 +127,13 @@ data21 %>% ggplot(aes(x=score_level, y=diff.total)) + geom_boxplot()
 data21 %>% group_by(score_level) %>% summarise(mean=mean(diff.total))
 mean(filter(data21,score_level=='high')$diff.total)
 
-world = world %>% rename(country=region)
-world = inner_join(world, data21, by="country")
-world %>% count(world$region)
-library(maps)
-world = map_data('world') 
-
-ggplot(world) + 
-  geom_map(mapping=aes(long, lat, map_id=region), map=world) + ggtitle("who gets better") 
-
+# myworld = world %>% rename(country=region)
+# myworld = inner_join(myworld, data21, by="country")
+# library(maps)
+# world = map_data('world') 
+# 
+# ggplot(world) + 
+#   geom_map(mapping=aes(long, lat, map_id=country), map=world) + ggtitle("who gets better") 
+# 
+# View(myworld)
+# View(world)
