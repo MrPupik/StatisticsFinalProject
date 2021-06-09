@@ -17,7 +17,7 @@ happ1920 = bind_rows(happ19, happ20)
 
 # lets look at the findings in this boxplots:
 
-happ1920 %>% ggplot(aes(y= Score, x=factor(year) ,fill=(year)), color = year) + geom_boxplot() +
+happ1920 %>% ggplot(aes(y= Score, x=factor(year) ,fill=factor(year)), color = year) + geom_boxplot() +
   ggtitle("Corona Happiness 2019 and 2020") + xlab("year") + theme(legend.position="none") 
 
 ###### i cant change the colors !!!!
@@ -25,6 +25,13 @@ happ1920 %>% ggplot(aes(y= Score, x=factor(year) ,fill=(year)), color = year) + 
 
 # and lets make a t-test:
 t.test(formula = happ1920$Score ~ happ1920$year, data = happ1920, alternative = "greater")
+
+# paired t-test:
+t.test(formula = happ1920$Score ~ happ1920$year, data = happ1920, paired = TRUE, alternative = "greater")
+
+#p-value is more than 0.05 , try to do it paired 
+# מדגם בין מדינות דומות, פיירד = טרו 
+
 
 # conclusion: because the p-value is .... we are going to ....
 # we can see that not only that 2019 wasn't happier than 2020, but that 2020 was even happier than 2019.
@@ -133,9 +140,16 @@ t.test(x = (data20 %>% filter(isWest == "west world country"))$`Ladder score`,
             %>% sample_n(25))$`Ladder score`,
        paired = TRUE, alternative = "greater")
 
+## we can try to do paired = false, and than we wont have to take a sample of 25 countries 
+# it worked!!!
+
+t.test(x = (data20 %>% filter(isWest == "west world country"))$`Ladder score`,
+       y = (data20 %>% filter(isWest == "rest of the world") %>% filter(!(`Regional indicator` == "Latin America and Caribbean")))$`Ladder score`, 
+       paired = FALSE, alternative = "greater")
+
 # conclusion ! 
-# we can see that the p-value is around 1e-07 ~ 9e-10 --> this is really small,
-# so we can confirm our assumption that living in west countries rasis your happiness score. 
+# we can see that the p-value < 2.2e-16 --> this is really small,
+# so we can confirm our assumption that living in west countries raieses your happiness score. 
 
 
 
