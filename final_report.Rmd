@@ -11,60 +11,202 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+> ::: {.headstrip}
+> ::: {style="margin: 10px; padding-left: 20px;"}
+> <p class="mainTitle" style=" display: inline-block; width: 50%; font-size: xx-large; color: whitesmoke">
 >
-<div class="headstrip">
-  <div style="margin: 10px; padding-left: 20px;">
-    <p class="mainTitle" style=" display: inline-block; width: 50%; font-size: xx-large; color: whitesmoke">World Happiness Analysis</p>
-    <h3 style="display: inline; margin: 5px; color: whitesmoke; float: right;" >june 2021</h3>  
-    <br/>
-    <p class="subTitle">Itay Zohar, Liri Bar-On, Amit Hadar</p>
-  </div>
- > 
-</div>
+> World Happiness Analysis
+>
+> </p>
+>
+> <h3 style="display: inline; margin: 5px; color: whitesmoke; float: right;">
+>
+> june 2021
+>
+> </h3>
+>
+> <br/>
+>
+> <p class="subTitle">
+>
+> Itay Zohar, Liri Bar-On, Amit Hadar
+>
+> </p>
+> :::
+> :::
 
 > <img src="resources/stairs.jpg"/>
 
-## <span style="color: #6600ff"> Introduction: </span>
+## [ Introduction: ]{style="color: #6600ff"}
 
-This article is a summery of our statistics project, where we analyze
-the results of [world happiness
-reports](https://worldhappiness.report/).  
-In our research we focused on
-the years 2015 to 2021. The Datasets we used can be found [on
+This article is a summery of our statistics project ([github
+link](https://github.com/MrPupik/StatisticsFinalProject/)), where we
+analyze the results of [world happiness
+reports](https://worldhappiness.report/).\
+In our research we focused on the years 2015 to 2021. The Datasets we
+used can be found [on
 Kaggle](https://www.kaggle.com/mathurinache/world-happiness-report-20152021)
 
 Since the data of each year came separately, and included different
 categories and measurements - the first stage of our work is to **tidy
 our data**. Make it ready to be worked on.
 
-**Note**: When we first introduce a variable and how we will adress it in this article, we will do so by the following structre: `varible` (_our term_)
-for example, `happiness score` (_score_)
+**Note**: When we first introduce a variable and how we will adress it
+in this article, we will do so by the following structre: `varible`
+(*our term*) for example, `happiness score` (*score*)
 
-The next two stages are the heart of our article: <u> Visualization and modeling.</u>
-We'll be Waking visualizations to explore the data, theorize about what we see, and proove/disproove our theories using statistical models and methods we learned throught the course.
+The next two stages are the heart of our article: <u> Visualization and
+modeling.</u> We'll be Waking visualizations to explore the data,
+theorize about what we see, and proove/disproove our theories using
+statistical models and methods we learned throught the course.
 
-Our goal is to explore interesting facts of world happiness, what affects it and how. 
-Questions we will focus on:
+Our goal is to explore interesting facts of world happiness, what
+affects it and how. Questions we will focus on:
 
 #### 1. Why are some countries happier than others? What makes a country "happy"?
 
-- Connection between `life expectancy` (_health_) and _score_. Specificity, is the connection linear?
-- Connection between the `region or continent` (_region_) and happiness
-- <span style="color: red">multiple regression on everything yay</span>
+-   Connection between `life expectancy` (*health*) and *score*.
+    Specificity, is the connection linear? (linear regression model)
+-   Connection between the `region or continent` (*region*) and
+    happiness (hypothesis testing, godness of fit)
+-   [multiple regression on everything yay]{style="color: red"}
 
-#### 2.happiens over the years  
+#### 2. Happiens over the years
 
-- Did Covid19 made the world sad? comparison of 2019 and 2020 *scores*  
-- Which year was the happiest? mean *score* over time.  
-- Connection between `GDP per capita` (_gdp_) and happiness - all years combined.
-- Are we getting happier ? trends in mean *score* over the years.  
-- Changes in happiness per country. Which countries changes the most?  
+-   Did Covid19 made our world sad? comparison of 2019 and 2020
+    *scores*\
+-   Which year was the happiest? mean *score* over time.\
+-   Connection between `GDP per capita` (*gdp*) and happiness - all
+    years combined.
+-   Are we getting happier ? trends in mean *score* over the years.\
+-   Changes in happiness per country. Which countries changes the most?
+
+## Data exploreation and tidying
+
+Initial setup:
+
+```{r import, include=FALSE}
+library(tidyverse)
+data15 = readr::read_csv(file="data/2015.csv")
+data16 = readr::read_csv(file="data/2016.csv")
+data17 = readr::read_csv(file="data/2017.csv")
+data18 = readr::read_csv(file="data/2018.csv")
+data19 = readr::read_csv(file="data/2019.csv")
+data20 = readr::read_csv(file="data/2020.csv")
+data21 = readr::read_csv(file="data/2021.csv")
+```
+
+Now let's have a glimpse of our dataset. we have 7 files, one for each
+year (2015-2021)
+
+### Glimpse all data: {.tabset}
+
+#### 2015
+
+```{r}
+
+glimpse(data15)
+```
+
+#### 2016
+
+```{r read2016}
+
+glimpse(data16)
+```
+
+#### 2017
+
+```{r read2017}
+
+glimpse(data17)
+```
+
+#### 2018
+
+```{r read2018}
+
+glimpse(data18)
+```
+
+#### 2019
+
+```{r read2019}
+
+glimpse(data19)
+```
+
+#### 2020
+
+```{r read2020}
+
+glimpse(data20)
+```
+
+#### 2021
+
+```{r read2021}
+
+glimpse(data21)
+```
+
+### Data Issues and setbacks
+
+1.  **Variable names:** names are not consistent between the years, for
+    example:\
+    `Happiness Score` in 2015, `Happiness.Score` in 2017, `Score` of
+    2018, etc... all refer to the same variable.\
+2.  **Number of variables**: not all the years contains the same
+    variables.
+3.  **Variable scale**: `health` is sometimes displayed in years, other
+    times in year / 100
+
+### Data tidying
+
+#### The Variables we are going to use in our research
+
+*Variables mutated by our team marked with an asterisk\**
+
++----------------+-----------------+-----------------+-----------------+
+| Name           | Description     | Type            | Include in      |
+|                |                 |                 | years           |
++================+=================+=================+=================+
+| country        | name of the     | char            | all             |
+|                | country         |                 |                 |
++----------------+-----------------+-----------------+-----------------+
+| region         | geographical    | char            | 2018-2021       |
+|                | r               |                 |                 |
+|                | egion/continent |                 |                 |
++----------------+-----------------+-----------------+-----------------+
+| score          | absolute        | double          | all             |
+|                | happiness score |                 |                 |
++----------------+-----------------+-----------------+-----------------+
+| gdp            | GDP per capita  | double          | all             |
++----------------+-----------------+-----------------+-----------------+
+| trust          | level of trust  | double          | all             |
+|                | in the          |                 |                 |
+|                | government      |                 |                 |
+|                | (subjective     |                 |                 |
+|                | perception of   |                 |                 |
+|                | the population) |                 |                 |
++----------------+-----------------+-----------------+-----------------+
+| health         | Life expectancy | double          | all             |
+|                | (years / 100)   |                 |                 |
++----------------+-----------------+-----------------+-----------------+
+| freedom        | Subjective      | double          | all             |
+|                | score of        |                 |                 |
+|                | individual      |                 |                 |
+|                | freedom         |                 |                 |
++----------------+-----------------+-----------------+-----------------+
+| year\*         | year of the     | double          | all             |
+|                | report          |                 |                 |
++----------------+-----------------+-----------------+-----------------+
 
 
-## Stage 0: data exploreation and tidying {.tabset}
+#### adjust scale of variables
 
-### la la la
 
-pipi kaki
+```{r adjust scale}
 
-### apchi
+glimpse(data21)
+```
