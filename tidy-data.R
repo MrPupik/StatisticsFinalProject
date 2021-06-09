@@ -83,6 +83,14 @@ for (i in c(1:length(AllData))) {
 }
 
 
+tidy15 = AllData[[1]]
+tidy16 = AllData[[2]]
+tidy17 = AllData[[3]]
+tidy18 = AllData[[4]]
+tidy19 = AllData[[5]] 
+tidy20 = AllData[[6]]
+tidy21 = AllData[[7]]
+
 entire_data = bind_rows(AllData[[1]],AllData[[2]],AllData[[3]], AllData[[4]], AllData[[5]], AllData[[6]], AllData[[7]])
 some_data = bind_rows(AllData[[1]],AllData[[4]], AllData[[7]])
 
