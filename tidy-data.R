@@ -30,7 +30,7 @@ data20 = data20 %>% mutate(`Logged GDP per capita`=`Logged GDP per capita` / 10)
 
 
 data18 = data18 %>% filter(!is.na(`Perceptions of corruption`)) %>% transform(`Perceptions of corruption`=as.double(data18$`Perceptions of corruption`))
-AllData = list(data15, data16, data17, data18, data19, data20 ,data21)
+arrAllData = list(data15, data16, data17, data18, data19, data20 ,data21)
 
 
 # data21 = data21 %>% select(-contains('error')) %>% select(-contains('error')) %>%
@@ -46,33 +46,33 @@ current_year = 15
 
 score_yearly = data15 %>% select(Country, `Happiness Score`) %>% rename(score15=`Happiness Score`, country=Country)
 
-for (i in c(1:length(AllData))) {
-  AllData[[i]] = AllData[[i]] %>% select(-contains('error')) %>% select(-contains('error')) %>%
+for (i in c(1:length(arrAllData))) {
+  arrAllData[[i]] = arrAllData[[i]] %>% select(-contains('error')) %>% select(-contains('error')) %>%
     select(-contains('Explained')) %>% select(-contains('Dystopia + residual'))
-  AllData[[i]] = rename(AllData[[i]], dystopia=matches("Dystopia", ignore.case = TRUE))
-  AllData[[i]] = rename(AllData[[i]],   country=contains("Country"),  
+  arrAllData[[i]] = rename(arrAllData[[i]], dystopia=matches("Dystopia", ignore.case = TRUE))
+  arrAllData[[i]] = rename(arrAllData[[i]],   country=contains("Country"),  
                         score=matches("Score", ignore.case = TRUE),
                         gdp=contains("GDP"), trust=contains("Corruption"),
                         health=contains("Health"), freedom=contains("Freedom"),
                         trust=matches("Corruption", ignore.case = TRUE),  dystopia=matches("Dystopia", ignore.case = TRUE))
   
   
-  AllData[[i]] = AllData[[i]] %>% rename(region=matches("region", ignore.case = TRUE))
-  AllData[[i]] = AllData[[i]] %>% mutate(year = current_year)
+  arrAllData[[i]] = arrAllData[[i]] %>% rename(region=matches(".*region.*", ignore.case = TRUE))
+  arrAllData[[i]] = arrAllData[[i]] %>% mutate(year = current_year)
   
-  if (any(names(AllData[[i]]) == 'region'))
+  if (any(names(arrAllData[[i]]) == 'region'))
   {
-    AllData[[i]] = AllData[[i]] %>% select(country,score, gdp, trust, health, freedom, trust, year, region) 
+    arrAllData[[i]] = arrAllData[[i]] %>% select(country,score, gdp, trust, health, freedom, trust, year, region) 
   }
   else
   {
-    AllData[[i]] = AllData[[i]] %>% select(country, score, gdp, trust, health, freedom, trust, year) %>% mutate(region = NA)
+    arrAllData[[i]] = arrAllData[[i]] %>% select(country, score, gdp, trust, health, freedom, trust, year) %>% mutate(region = NA)
   }
   
   
   if (current_year > 15)
   {
-    current_score_yearly = AllData[[i]] %>% select(country, score)
+    current_score_yearly = arrAllData[[i]] %>% select(country, score)
     current_score_yearly[[paste('score', current_year, sep = '')]] = current_score_yearly$score
     current_score_yearly = current_score_yearly[ ,!(colnames(current_score_yearly) == "score")]
     score_yearly = inner_join(score_yearly, current_score_yearly, by="country")
@@ -83,16 +83,16 @@ for (i in c(1:length(AllData))) {
 }
 
 
-tidy15 = AllData[[1]]
-tidy16 = AllData[[2]]
-tidy17 = AllData[[3]]
-tidy18 = AllData[[4]]
-tidy19 = AllData[[5]] 
-tidy20 = AllData[[6]]
-tidy21 = AllData[[7]]
+tidy15 = arrAllData[[1]]
+tidy16 = arrAllData[[2]]
+tidy17 = arrAllData[[3]]
+tidy18 = arrAllData[[4]]
+tidy19 = arrAllData[[5]] 
+tidy20 = arrAllData[[6]]
+tidy21 = arrAllData[[7]]
 
-entire_data = bind_rows(AllData[[1]],AllData[[2]],AllData[[3]], AllData[[4]], AllData[[5]], AllData[[6]], AllData[[7]])
-some_data = bind_rows(AllData[[1]],AllData[[4]], AllData[[7]])
+entire_data = bind_rows(arrAllData[[1]],arrAllData[[2]],arrAllData[[3]], arrAllData[[4]], arrAllData[[5]], arrAllData[[6]], arrAllData[[7]])
+some_data = bind_rows(arrAllData[[1]],arrAllData[[4]], arrAllData[[7]])
 
 # factor
 entire_data = entire_data %>% mutate(year = factor(year))

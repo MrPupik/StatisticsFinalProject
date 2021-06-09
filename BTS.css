@@ -21,6 +21,11 @@
 .mainTitle {
   /* This section calls the slideInFromLeft animation we defined above */
   animation: 1s ease-out 0s 1 slideInFromLeft;
+   display: inline-block;
+   width: 50%;
+   font-size: large;
+   color: whitesmoke;
+   margin-top: 5px;
 }
 
 .subTitle {
