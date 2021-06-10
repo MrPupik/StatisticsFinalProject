@@ -1,3 +1,8 @@
+source("tidy-data.R")
+
+
+
+
 library("tidyverse")
 data18 = readr::read_csv(file="data/2018.csv")
 View(data18)
