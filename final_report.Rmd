@@ -1,6 +1,6 @@
 ---
-title:
-output: html_document
+title: World Happiness Analysis
+output: rmdformats::readthedown
 css: "BTS.css"
 editor_options:
   markdown:
@@ -8,63 +8,310 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
+library(rmdformats)
 knitr::opts_chunk$set(echo = TRUE)
-```
 
->
-<div class="headstrip">
+```
+>   <div class="headstrip">
   <div style="margin: 10px; padding-left: 20px;">
-    <p class="mainTitle" style=" display: inline-block; width: 50%; font-size: xx-large; color: whitesmoke">World Happiness Analysis</p>
-    <h3 style="display: inline; margin: 5px; color: whitesmoke; float: right;" >june 2021</h3>  
+   <p class="mainTitle">Statistics project</p>
+   <h3 style="display: inline; margin: 5px; color: whitesmoke; float: right;" >june 2021</h3>  
     <br/>
     <p class="subTitle">Itay Zohar, Liri Bar-On, Amit Hadar</p>
   </div>
- > 
+  
 </div>
+
 
 > <img src="resources/stairs.jpg"/>
 
-## <span style="color: #6600ff"> Introduction: </span>
+## [Introduction:]{style="color: #6600ff"}
 
-This article is a summery of our statistics project, where we analyze
-the results of [world happiness
-reports](https://worldhappiness.report/).  
-In our research we focused on
-the years 2015 to 2021. The Datasets we used can be found [on
+This article is a summery of our statistics project ([github
+link](https://github.com/MrPupik/StatisticsFinalProject/)), where we
+analyze the results of [world happiness
+reports](https://worldhappiness.report/).\
+In our research we focused on the years 2015 to 2021. The Datasets we
+used can be found [on
 Kaggle](https://www.kaggle.com/mathurinache/world-happiness-report-20152021)
 
 Since the data of each year came separately, and included different
 categories and measurements - the first stage of our work is to **tidy
 our data**. Make it ready to be worked on.
 
-**Note**: When we first introduce a variable and how we will adress it in this article, we will do so by the following structre: `varible` (_our term_)
-for example, `happiness score` (_score_)
+**Note**: When we first introduce a variable and how we will adress it
+in this article, we will do so by the following structre: `varible`
+(*our term*) for example, `happiness score` (*score*)
 
-The next two stages are the heart of our article: <u> Visualization and modeling.</u>
-We'll be Waking visualizations to explore the data, theorize about what we see, and proove/disproove our theories using statistical models and methods we learned throught the course.
+The next two stages are the heart of our article: <u> Visualization and
+modeling.</u> We'll be Waking visualizations to explore the data,
+theorize about what we see, and proove/disproove our theories using
+statistical models and methods we learned throught the course.
 
-Our goal is to explore interesting facts of world happiness, what affects it and how. 
-Questions we will focus on:
+Our goal is to explore interesting facts of world happiness, what
+affects it and how. Questions we will focus on:
 
 #### 1. Why are some countries happier than others? What makes a country "happy"?
 
-- Connection between `life expectancy` (_health_) and _score_. Specificity, is the connection linear?
-- Connection between the `region or continent` (_region_) and happiness
-- <span style="color: red">multiple regression on everything yay</span>
+-   Connection between `life expectancy` (*health*) and *score*.
+    Specificity, is the connection linear? (linear regression model)
+-   Connection between the `region or continent` (*region*) and
+    happiness (hypothesis testing, godness of fit)
+-   [multiple regression on everything yay]{style="color: red"}
 
-#### 2.happiens over the years  
+#### 2. Happiens over the years
 
-- Did Covid19 made the world sad? comparison of 2019 and 2020 *scores*  
-- Which year was the happiest? mean *score* over time.  
-- Connection between `GDP per capita` (_gdp_) and happiness - all years combined.
-- Are we getting happier ? trends in mean *score* over the years.  
-- Changes in happiness per country. Which countries changes the most?  
+-   Did Covid19 made our world sad? comparison of 2019 and 2020
+    *scores*\
+-   Which year was the happiest? mean *score* over time.\
+-   Connection between `GDP per capita` (*gdp*) and happiness - all
+    years combined.
+-   Are we getting happier ? trends in mean *score* over the years.\
+-   Changes in happiness per country. Which countries changes the most?
+
+## [Data exploreation and tidying:]{style="color: #6600ff"}
+
+Initial setup and data import:
+
+```{r import, results="hide", message=FALSE}
+library(tidyverse)
+data15 = readr::read_csv(file="data/2015.csv")
+data16 = readr::read_csv(file="data/2016.csv")
+data17 = readr::read_csv(file="data/2017.csv")
+data18 = readr::read_csv(file="data/2018.csv")
+data19 = readr::read_csv(file="data/2019.csv")
+data20 = readr::read_csv(file="data/2020.csv")
+data21 = readr::read_csv(file="data/2021.csv")
+```
+
+Now let's have a glimpse of our dataset. we have 7 files, one for each
+year (2015-2021)
+
+### Glimpse all data: {.tabset}
+
+#### 2015
+
+```{r}
+
+glimpse(data15)
+```
+
+#### 2016
+
+```{r read2016}
+
+glimpse(data16)
+```
+
+#### 2017
+
+```{r read2017}
+
+glimpse(data17)
+```
+
+#### 2018
+
+```{r read2018}
+
+glimpse(data18)
+```
+
+#### 2019
+
+```{r read2019}
+
+glimpse(data19)
+```
+
+#### 2020
+
+```{r read2020}
+
+glimpse(data20)
+```
+
+#### 2021
+
+```{r read2021}
+
+glimpse(data21)
+```
+
+### Data Issues and setbacks
+
+1.  **Variable names:** names are not consistent between the years, for
+    [[example:\\\\](example:\\){.uri}]([example:\\](example:\){.uri}){.uri}
+    `Happiness Score` in 2015, `Happiness.Score` in 2017, `Score` of
+    2018, etc... all refer to the same variable.\
+2.  **Number of variables**: not all the years contains the same
+    variables.
+3.  **Variable scale**: `health` is sometimes displayed in years, other
+    times in year / 100
+
+### Data tidying
+
+#### The Variables we are going to use in our research
+
+*Variables mutated by our team marked with an asterisk\**
+
++------------+-------------------------------------+------+----------+
+| Name       | Description                         | Type | Include  |
+|            |                                     |      | in years |
++============+=====================================+======+==========+
+| country    | name of the country                 | char | all      |
++------------+-------------------------------------+------+----------+
+| region     | geographical r egion/continent      | char | 20       |
+|            |                                     |      | 15-2016, |
+|            |                                     |      | 2        |
+|            |                                     |      | 018-2021 |
++------------+-------------------------------------+------+----------+
+| score      | absolute happiness score            | do   | all      |
+|            |                                     | uble |          |
++------------+-------------------------------------+------+----------+
+| gdp        | GDP per capita                      | do   | all      |
+|            |                                     | uble |          |
++------------+-------------------------------------+------+----------+
+| trust      | level of trust in the government    | do   | all      |
+|            | (subjective perception of the       | uble |          |
+|            | population)                         |      |          |
++------------+-------------------------------------+------+----------+
+| health     | Life expectancy (years / 100)       | do   | all      |
+|            |                                     | uble |          |
++------------+-------------------------------------+------+----------+
+| freedom    | Subjective score of individual      | do   | all      |
+|            | freedom                             | uble |          |
++------------+-------------------------------------+------+----------+
+| year\*     | year of the report                  | do   | all      |
+|            |                                     | uble |          |
++------------+-------------------------------------+------+----------+
+
+#### adjust scale and type of variables
+
+```{r adjust scale, }
 
 
-## Stage 0: data exploreation and tidying {.tabset}
+# life expectancy is between 0-100 in 2020 and 20201, before that range is 0-1
+data21 = data21 %>% mutate(`Healthy life expectancy`=`Healthy life expectancy` / 100) # in 2021 it's in years
+data20 = data20 %>% mutate(`Healthy life expectancy`=`Healthy life expectancy` / 100) # in 2020 it's in years
 
-### la la la
+# gdp is between 0-100 in 2020 and 20201, before that range is 0-1
+data21 = data21 %>% mutate(`Logged GDP per capita`=`Logged GDP per capita` / 10) 
+data20 = data20 %>% mutate(`Logged GDP per capita`=`Logged GDP per capita` / 10) 
 
-pipi kaki
+# for some reason, in 2018 "trust" was charecter and not double.
+data18 = data18 %>% filter(!is.na(`Perceptions of corruption`)) %>% transform(`Perceptions of corruption`=as.double(data18$`Perceptions of corruption`))
 
-### apchi
+# aggregate all data into a list
+arrAllData = list(data15, data16, data17, data18, data19, data20 ,data21)
+
+
+
+```
+
+#### Iterate over all data to create unified data-frames and one combined big data-frame
+
+Now that we have an array containing the entire data, we can iterate over it and tidy all:
+
+
+```{r for loop, message=FALSE, results='hold'}
+
+
+current_year = 15
+
+# this will contain country name, and 7 more columns: score of every year
+score_yearly = data15 %>% select(Country, `Happiness Score`) %>% rename(score15=`Happiness Score`, country=Country)
+
+# iterate over all data
+for (i in c(1:length(arrAllData))) {
+  # remove unwanted columns which hava similar names to columns we're interested in.
+  arrAllData[[i]] = arrAllData[[i]] %>% select(-contains('error')) %>% select(-contains('error')) %>%
+    select(-contains('Explained')) %>% select(-contains('Dystopia + residual'))
+  
+  # rename columns
+  arrAllData[[i]] = rename(arrAllData[[i]], dystopia=matches("Dystopia", ignore.case = TRUE))
+  arrAllData[[i]] = rename(arrAllData[[i]],   country=contains("Country"),  
+                        score=matches("Score", ignore.case = TRUE),
+                        gdp=contains("GDP"), trust=contains("Corruption"),
+                        health=contains("Health"), freedom=contains("Freedom"),
+                        trust=matches("Corruption", ignore.case = TRUE),  dystopia=matches("Dystopia", ignore.case = TRUE))
+  
+  # speciel case - some of the years don't have region
+  arrAllData[[i]] = arrAllData[[i]] %>% rename(region=matches(".*region.*", ignore.case = TRUE))
+  
+  arrAllData[[i]] = arrAllData[[i]] %>% mutate(year = current_year)
+  
+  # select the coulmns we need. if no region - create region column and fill it with NA
+  if (any(names(arrAllData[[i]]) == 'region'))
+  {
+    arrAllData[[i]] = arrAllData[[i]] %>% select(country,score, gdp, trust, health, freedom, trust, year, region) 
+  }
+  else
+  {
+    arrAllData[[i]] = arrAllData[[i]] %>% select(country, score, gdp, trust, health, freedom, trust, year) %>% mutate(region = NA)
+  }
+  
+  # fill score_yearly
+  if (current_year > 15)
+  {
+    current_score_yearly = arrAllData[[i]] %>% select(country, score)
+    
+    # rename score to score[year]
+    current_score_yearly[[paste('score', current_year, sep = '')]] = current_score_yearly$score
+    current_score_yearly = current_score_yearly[ ,!(colnames(current_score_yearly) == "score")]
+    
+    # add new coulmn to score_yearly
+    score_yearly = inner_join(score_yearly, current_score_yearly, by="country")
+  }
+  
+  # next year
+  current_year = current_year + 1
+  
+}
+
+```
+
+
+Almost done, now let's create our dataframes:
+
+```{r final tidy, message=FALSE, results='hold'}
+
+# convert year to factor, add isIsrael boolean variable.
+tidy15 = arrAllData[[1]]  %>% mutate(year = factor(year))  %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
+tidy16 = arrAllData[[2]]  %>% mutate(year = factor(year))  %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
+tidy17 = arrAllData[[3]]  %>% mutate(year = factor(year))  %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
+tidy18 = arrAllData[[4]]  %>% mutate(year = factor(year))  %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
+tidy19 = arrAllData[[5]]  %>% mutate(year = factor(year))  %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
+tidy20 = arrAllData[[6]]  %>% mutate(year = factor(year))  %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
+tidy21 = arrAllData[[7]]  %>% mutate(year = factor(year))  %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
+
+# merge all to one table
+entire_data = bind_rows(tidy15 ,tidy16, tidy17, tidy18, tidy19, tidy20, tidy21)
+
+# merge only 2015, 2018, 2021 - shorter version.
+some_data = bind_rows(tidy15,tidy18, tidy21)
+```
+
+
+### results {.tabset}
+
+here is the tidy data:
+
+#### tidy15
+
+```{r tidy15}
+tidy15
+```
+
+#### entire_data
+
+```{r entire_data}
+entire_data
+```
+
+#### score_yearly
+
+```{r score yearly}
+score_yearly
+```
+

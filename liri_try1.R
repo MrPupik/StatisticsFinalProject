@@ -1,3 +1,8 @@
+source("tidy-data.R")
+
+
+
+
 library("tidyverse")
 data21 = readr::read_csv(file="data/2021.csv")
 View(data21)
