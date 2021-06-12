@@ -374,21 +374,21 @@ print(data21_lm)
 
 ```
 
-y= -2.395 + 0.122x
+### $$ \hat{Y}: y = -2.395 + 0.122x $$
 
-The R-Squared is high-middle,  0.59, which means that around 60% of the variation in the dependent variable is explained by the independent variable. 
+The R-Squared is 0.59, which is considered high. This means that around 60% of the variation in the dependent variable is explained by the independent variable. 
 p-Value < 2.2e-16 - We can consider a linear model to be statistically significant only when p-Value is less that the statistical significance level, which is 0.05.
 
-we have two assumptions about the regression model:
-* residuals are homoscedastic - if the data homoscedastic we shouldn't see any connection between the points.
-* residuals are distributed normally- If the data are exactly normal, we expect the points to lie on a straight line.
+we have two assumptions about the regression model:  
+** residuals are homoscedastic - if the data homoscedastic we shouldn't see any   connection between the points.  
+** residuals are distributed normally- If the data are exactly normal, we expect the   points to lie on a straight line on the QQ graph.  
 
 
 ```{r residuals}
 
 
 data21_lm %>% ggplot(aes(x=.fitted,y=.resid, frame=FALSE)) +
-geom_point(alpha=0.1) + geom_hline(yintercept=0) +
+geom_point(fill="white", shape=21, size=2) + geom_hline(yintercept=0) +
 labs(title="Residual Plot")
 
  qqnorm(data21$'Ladder score', pch = 1, frame = FALSE)
@@ -406,7 +406,7 @@ labs(title="Residual Plot")
 * The Residuals Plot shows homoscedastic.
 * our QQ plot shows that our residuals are distributed normal.
 
-To sum up this results we can determine which there is a linear correlation between score and Healthy life expectancy.
+To sum up this results we can determine there is a linear correlation between score and Healthy life expectancy.
 
 
 
@@ -424,8 +424,32 @@ To sum up this results we can determine which there is a linear correlation betw
 
 ## 2.1 Covid19 impact
  
- 
-determine which there is a linear corrolotaion between score and Healthy life expectancy.
+How is corona virus, that occurred in 2020,effected the post-covid happiness in 2021? Our hypothesis was that the pandemic decreased world happiness:  
+$h_{0}$: the world happiness was the same during 2019 (before) and 2021 (after)  
+$h_{1}$: world happiness was higher in 2019 than in 2021 - the corona virus caused the world happiness to descend  
+```{r covid 1}
+t.test(x = score_yearly$score21 , y = score_yearly$score19 , paired = TRUE, alternative = "less")
+```
+
+We can see `p-value` is very high. This means we cannot reject h_0. To our suprise - The corona pandemic did not impact happiness like we thought.
+
+Lets take a look at the findings with boxplots:
+
+```{r covid 2}
+entire_data %>% filter(year %in% c(19,21)) %>% ggplot(aes(y= score, x=factor(year) ,fill=factor(year)), color = year) + geom_boxplot() +
+  ggtitle("Corona Happiness 2019 and 2021") + xlab("year") + theme(legend.position="none") 
+```
+
+We can see that the mean of the happiness score is higher in 2021 than in 2019
+lets make a paird t-test to check it:
+
+```{r }
+t.test(x = score_yearly$score21 , y = score_yearly$score19 , paired = TRUE, alternative = "greater")
+
+```
+
+It is true, `p-value` < 0.05. According to this test 2021's happiness **is greater** then 2019.
+
 
 ## 2.2 Best year so far
  
