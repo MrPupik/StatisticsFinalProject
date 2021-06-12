@@ -187,7 +187,7 @@ glimpse(data21)
 
 #### adjust scale and type of variables
 
-```{r adjust scale, }
+```{r adjust scale,  warning=FALSE}
 
 
 # life expectancy is between 0-100 in 2020 and 20201, before that range is 0-1
@@ -255,7 +255,7 @@ for (i in c(1:length(arrAllData))) {
   
   # add isIsrael variable
    arrAllData[[i]] = arrAllData[[i]] %>% 
-    mutate(isIsrael = ifelse(country == "Israel", 1, 0)) %>% mutate(isIsrael = factor(isIsrael))
+    mutate(isIsrael = ifelse(country == "Israel", TRUE, FALSE)) %>% mutate(isIsrael = factor(isIsrael))
   
   # fill score_yearly
   if (current_year > 15)
@@ -390,7 +390,7 @@ geom_point(fill="white", shape=21, size=2) + geom_hline(yintercept=0) +
 labs(title="Residual Plot")
 
 # show qqplot to test normal distribution
- qqnorm(tidy21$score, pch = 1, frame = FALSE)
+ qqnorm(tidy21$score, pch = 1, frame = FALSE, main="Residual noramllity check")
  qqline(tidy21$score, col = "steelblue", lwd = 2)
 
 
@@ -483,8 +483,11 @@ We were rign in 99% !
 This is also noticeable in a boxplot:
 
 ```{r region 4}
+# add coulmn indicate if western or not
 tidy20 = tidy20 %>% mutate(isWest = ifelse(region %in% c("Western Europe", "North America and ANZ") 
                                            , "western countries" , "non western countries"))
+
+# show plot
 tidy20 %>% 
   ggplot(aes(y=score, x=factor(isWest) ,fill=(isWest), width = 0.5))  + geom_boxplot() +
   theme(legend.position="none", axis.text.x = element_text(color = "black", size = 15 )) + xlab("") + ylab("Score")
@@ -590,7 +593,7 @@ This can begin to explain the mental state of the people of the diffrent countri
 ## 2.3 Changes in Happiness per country
 
 
-In order to see improvments and declines in happiness vor every country, we will introduce new variable - `diff`: diffrence in score over time
+In order to see improvments and declines in happiness for every country, we will introduce new variable - `diff`: diffrence in score over time
 
 ```{r diff prepare, message=FALSE, results="hide"}
 
@@ -619,18 +622,26 @@ diff21 = diff21 %>% mutate(diff.abs = abs(diff.total))
 ```
 
 
-### results
+### results {.tabset}
 
 `diff18`: diffrence between score of 2015 and 2018  
 `diff21`: diffrence between score of 2018 and 2021   
 `diff.total`: diffrence between score of 2015 and 2021 
 
-```{r diff result 1}
+#### diff_data
+
+```{r diff result 9}
 diff_data
-diff21
 ```
 
-This is how `diff` per country looks like:
+#### diff21
+
+```{r diff result 10}
+diff_data
+```
+
+
+This is how `diff.total` per country looks like, each point is the difference single country:
 
 ```{r diff result 2}
 diff21 %>% ggplot(aes(x=score, y=diff.total)) + geom_point() + geom_smooth()
@@ -688,7 +699,11 @@ diff21 %>% ggplot(aes(x=score_level, y=diff.abs, color=score_level)) + geom_boxp
 
 
 
-### conclusion
-First, is clear both that the difference for low-happiness countries is negative, while for medium and high, it is positive.
-Second, the happier a country is - the it's score tends to change.
+### Conclusion
+First, it is clear both that the difference for low-happiness countries is negative, while for medium and high, it is positive.  
 
+Second, the score of happier countries tend to change less.
+
+
+
+> <img src="resources/dolls.jpg"/>
