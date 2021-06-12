@@ -20,12 +20,13 @@ data21 = readr::read_csv(file="data/2021.csv")
 
 # column names are not the same between different years.
 # we are going to have to rename them.
-# we wont to compare israel's data between years - so tidy data to make country column :
 
+# life expectancy is between 0-100 in 2020 and 20201, before that range is 0-1
 data21 = data21 %>% mutate(`Healthy life expectancy`=`Healthy life expectancy` / 100) # in 2021 it's in years
-data20 = data20 %>% mutate(`Healthy life expectancy`=`Healthy life expectancy` / 100) # in 2021 it's in years
+data20 = data20 %>% mutate(`Healthy life expectancy`=`Healthy life expectancy` / 100) # in 2020 it's in years
 
-data21 = data21 %>% mutate(`Logged GDP per capita`=`Logged GDP per capita` / 10) # in 2021 it's in years
+# gdp is between 0-100 in 2020 and 20201, before that range is 0-1
+data21 = data21 %>% mutate(`Logged GDP per capita`=`Logged GDP per capita` / 10) 
 data20 = data20 %>% mutate(`Logged GDP per capita`=`Logged GDP per capita` / 10) # in 2021 it's in years
 
 
@@ -58,7 +59,8 @@ for (i in c(1:length(arrAllData))) {
   
   
   arrAllData[[i]] = arrAllData[[i]] %>% rename(region=matches(".*region.*", ignore.case = TRUE))
-  arrAllData[[i]] = arrAllData[[i]] %>% mutate(year = current_year)
+  
+  arrAllData[[i]] = arrAllData[[i]] %>% mutate(year = current_year) %>% mutate(year = factor(year))
   
   if (any(names(arrAllData[[i]]) == 'region'))
   {
@@ -68,6 +70,10 @@ for (i in c(1:length(arrAllData))) {
   {
     arrAllData[[i]] = arrAllData[[i]] %>% select(country, score, gdp, trust, health, freedom, trust, year) %>% mutate(region = NA)
   }
+  
+  
+  arrAllData[[i]] = arrAllData[[i]] %>% 
+    mutate(isIsrael = ifelse(country == "Israel", 1, 0)) %>% mutate(isIsrael = factor(isIsrael))
   
   
   if (current_year > 15)
@@ -82,21 +88,21 @@ for (i in c(1:length(arrAllData))) {
   
 }
 
+# for (i in c(1:length(arrAllData))) {
+#   arrAllData[[i]] = arrAllData[[i]]  %>%
+#     mutate(year = factor(year))  %>% 
+#     mutate(isIsrael = ifelse(country == "Israel", 1, 0)) %>% mutate(isIsrael = factor(isIsrael))
+# }
+# 
 
-tidy15 = arrAllData[[1]]
-tidy16 = arrAllData[[2]]
-tidy17 = arrAllData[[3]]
-tidy18 = arrAllData[[4]]
+tidy15 = arrAllData[[1]] 
+tidy16 = arrAllData[[2]] 
+tidy17 = arrAllData[[3]] 
+tidy18 = arrAllData[[4]] 
 tidy19 = arrAllData[[5]] 
-tidy20 = arrAllData[[6]]
-tidy21 = arrAllData[[7]]
+tidy20 = arrAllData[[6]] 
+tidy21 = arrAllData[[7]] 
 
-entire_data = bind_rows(arrAllData[[1]],arrAllData[[2]],arrAllData[[3]], arrAllData[[4]], arrAllData[[5]], arrAllData[[6]], arrAllData[[7]])
-some_data = bind_rows(arrAllData[[1]],arrAllData[[4]], arrAllData[[7]])
+entire_data = bind_rows(tidy15 ,tidy16, tidy17, tidy18, tidy19, tidy20, tidy21)
+some_data = bind_rows(tidy15,tidy18, tidy21)
 
-# factor
-entire_data = entire_data %>% mutate(year = factor(year))
-some_data = some_data %>% mutate(year = factor(year))
-
-entire_data = entire_data %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
-some_data = some_data %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
