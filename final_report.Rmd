@@ -30,9 +30,9 @@ knitr::opts_chunk$set(echo = TRUE)
 This article is a summery of our statistics project ([github
 link](https://github.com/MrPupik/StatisticsFinalProject/)), where we
 analyze the results of [world happiness
-reports](https://worldhappiness.report/).\
+reports (link)](https://worldhappiness.report/).
 In our research we focused on the years 2015 to 2021. The Datasets we
-used can be found [on
+used can be found [here on
 Kaggle](https://www.kaggle.com/mathurinache/world-happiness-report-20152021)
 
 Since the data of each year came separately, and included different
@@ -57,7 +57,6 @@ affects it and how. Questions we will focus on:
     Specificity, is the connection linear? (linear regression model)
 -   Connection between the `region or continent` (*region*) and
     happiness (hypothesis testing, godness of fit)
--   [multiple regression on everything yay]{style="color: red"}
 
 #### 2. Happiens over the years
 
@@ -304,19 +303,19 @@ some_data = bind_rows(tidy15,tidy18, tidy21)
 
 here is the tidy data:
 
-#### tidy15
+### tidy15
 
 ```{r tidy15}
 tidy15
 ```
 
-#### entire_data
+### entire_data
 
 ```{r entire_data}
 entire_data
 ```
 
-#### score_yearly
+### score_yearly
 
 ```{r score yearly}
 score_yearly
@@ -343,7 +342,6 @@ trust_plot + theme(text = element_text(size=20))
 
 ```
 
-**$LIRI$**  
 The connection between gdp and freedom looks linear. In addition trust looks not linear, but is health linear? lets check!
 
 
@@ -359,13 +357,13 @@ The relation between the health and the score looks like:
 ```{r liniar_model}
 
 # use linear model with geom_smooth
-data21 %>% ggplot(aes(y= `Ladder score` , x= `Healthy life expectancy` ))+
+tidy21 %>% ggplot(aes(y= score , x=health ))+
 geom_point(color="deeppink")+ scale_y_log10()+
 stat_smooth(method = "lm",color="black")
 
 
 # linear regression test
-data21_lm = lm(formula =data21$`Ladder score` ~ data21$`Healthy life expectancy` ,data=data21)
+data21_lm = lm(formula =tidy21$score ~ tidy21$health ,data=data21)
 summary(data21_lm)
 print(data21_lm)
 
@@ -386,20 +384,18 @@ we have two assumptions about the regression model:
 
 ```{r residuals}
 
-
+# show linear model residuals on a plot 
 data21_lm %>% ggplot(aes(x=.fitted,y=.resid, frame=FALSE)) +
 geom_point(fill="white", shape=21, size=2) + geom_hline(yintercept=0) +
 labs(title="Residual Plot")
 
- qqnorm(data21$'Ladder score', pch = 1, frame = FALSE)
- qqline(data21$'Ladder score', col = "steelblue", lwd = 2)
+# show qqplot to test normal distribution
+ qqnorm(tidy21$score, pch = 1, frame = FALSE)
+ qqline(tidy21$score, col = "steelblue", lwd = 2)
 
 
 ```
 
-
-
-  
 
 #### conclusion
 
@@ -413,10 +409,88 @@ To sum up this results we can determine there is a linear correlation between sc
 ## 1.2 Connection between region and score
   
   
+How dows the area you live in will effect your happiness ? 
+
+Let's see the score of the different regions: 
+```{r region 1}
+
+# calculate mean of each area and placed the means in a new table.
+by_reg = tidy21 %>% select(region, score)
+mean_by_reg = aggregate(by_reg[2], list(by_reg$region), mean)  %>% rename(Region = Group.1)
+
+
+# plot geom_cols of the means:
+ggplot(mean_by_reg, aes(Region, score)) + geom_col(aes(fill = score), width = 0.7) +
+  ggtitle("Happiness Score By Area") + theme(legend.position="none") + 
+  theme(axis.text.x=element_text(angle=45, hjust=1))+ylab("Score") + 
+  scale_fill_gradient(low = "orchid4", high = "plum2", space = "Lab",  guide = "colourbar",  aesthetics = "fill" )
+
+
+```
+
+Next, lets use  chi test to see if we can assume normal distribution at the world happiness score in 2021:
+
+```{r region 2}
+
+# creating groups of happiness score, to see how many measurements are actually in each group
+happy_new = tidy21 %>% 
+  mutate(new_groups = cut(score, breaks = c(0, 4, 5, 6, 7, 8)))   
+
+# we need to make sure that there are more than 5 in each group 
+happy_new %>% count(new_groups)
+
+# making a test shows whats the possibility to be in each of the groups (until 4, until 5, until 6....), according to normal distribution 
+
+pnorm(q = c(4, 5, 6, 7, 8), mean = mean(tidy21$score), sd = sd(tidy21$score))
+
+#multiple by the number of countries (153) we will get the expected cumulative 
+expected_cum = pnorm(q = c(4, 5, 6, 7, 8), mean = mean(tidy21$score), sd = sd(tidy21$score)) *149
+
+# to see the exact number of expediency we will have to subtract the wanted group with all of her previous
+expected = expected_cum[1:5] - c(0, expected_cum[1:4])
+
+by_group = happy_new %>% count(new_groups, name = "observed") %>% mutate(expected = expected) %>% mutate(chi = ((expected-observed)^2)/expected)
+chi_sq = sum(by_group$chi)
+chi_sq
+
+#table value:
+qchisq(p = 1-0.05, df = 5-2-1)
+
+```
+
+Chi actual result is smaller than theoretical one ! it means we are going to accept the assumption that the world happiness distribution is normal.  
   
   
-  
-  
+What we're now interesting in is weather western countries are happier than non-western countries.
+We can preform hypothesis testing to examine this.
+
+$h_0$: Mean of western countries score equals to score's $\mu$ (expectation)
+$h_1$: Mean of western countries score greater then score's $\mu$ (expectation)
+
+```{r region 3}
+
+# filter only western countries
+west = tidy21 %>% filter(region %in% c("Western Europe", "North America and ANZ"))
+mu = mean(tidy21$score)
+
+# t.test agains total mu
+t.test(x = west$score, alternative = "greater", mu = mu, conf.level = 0.99)
+```
+
+`p-value` < 0.01. We here by reject $h_0$. Mean of western countries is greater then total mean.
+We were rign in 99% !
+
+This is also noticeable in a boxplot:
+
+```{r region 4}
+tidy20 = tidy20 %>% mutate(isWest = ifelse(region %in% c("Western Europe", "North America and ANZ") 
+                                           , "western countries" , "non western countries"))
+tidy20 %>% 
+  ggplot(aes(y=score, x=factor(isWest) ,fill=(isWest), width = 0.5))  + geom_boxplot() +
+  theme(legend.position="none", axis.text.x = element_text(color = "black", size = 15 )) + xlab("") + ylab("Score")
+
+```
+
   
   
   
@@ -424,9 +498,11 @@ To sum up this results we can determine there is a linear correlation between sc
 
 ## 2.1 Covid19 impact
  
-How is corona virus, that occurred in 2020,effected the post-covid happiness in 2021? Our hypothesis was that the pandemic decreased world happiness:  
+How is corona virus, that occurred in 2020,effected the post-covid happiness in 2021? Our hypothesis was that the pandemic decreased world happiness:
+   
 $h_{0}$: the world happiness was the same during 2019 (before) and 2021 (after)  
 $h_{1}$: world happiness was higher in 2019 than in 2021 - the corona virus caused the world happiness to descend  
+  
 ```{r covid 1}
 t.test(x = score_yearly$score21 , y = score_yearly$score19 , paired = TRUE, alternative = "less")
 ```
@@ -453,7 +529,7 @@ It is true, `p-value` < 0.05. According to this test 2021's happiness **is great
 
 ## 2.2 Best year so far
  
-To comapre the happiness between the years, we started with a simple histogram - showing what scores are common for every year:
+To compare the happiness between the years, we started with a simple histogram - showing what scores are common for every year:
 
 ```{r yearly_histogram}
 some_data %>% ggplot(aes(x=`score`, color=year)) + geom_density()
@@ -546,7 +622,7 @@ diff21 = diff21 %>% mutate(diff.abs = abs(diff.total))
 ### results
 
 `diff18`: diffrence between score of 2015 and 2018  
-`diff21`: diffrence between score of 2018 and 2021 
+`diff21`: diffrence between score of 2018 and 2021   
 `diff.total`: diffrence between score of 2015 and 2021 
 
 ```{r diff result 1}
