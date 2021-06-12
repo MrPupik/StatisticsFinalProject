@@ -344,62 +344,70 @@ trust_plot + theme(text = element_text(size=20))
 ```
 
 **$LIRI$**  
-connection of gdp+freedom looks liniar, trust not linar, but is health liniat? lets check yay !!  
-**$LIRI$**  
+The connection between gdp and freedom looks linear. In addition trust looks not linear, but is health linear? lets check!
+
 
 
 ### Linair model for score ~ health
 
-**$LIRI$**  
-short explanation of linar regression -> goal is high r-squered
-**$LIRI$**  
+
+The relation between the health and the score looks like:
 
 
 
 
 ```{r liniar_model}
 
-# use liniar model with geom_smooth
-tidy21 %>% ggplot(aes(y=score , x=health))+
-geom_point(color="lightskyblue")+ scale_y_log10()+
-geom_smooth(method = "lm",color="black") + theme(text= element_text(size=20))
+# use linear model with geom_smooth
+data21 %>% ggplot(aes(y= `Ladder score` , x= `Healthy life expectancy` ))+
+geom_point(color="deeppink")+ scale_y_log10()+
+stat_smooth(method = "lm",color="black")
 
-# liniar regression test
-tidy21_lm = lm(formula =tidy21$score ~ tidy21$health ,data=tidy21)
-summary(tidy21_lm)
+
+# linear regression test
+data21_lm = lm(formula =data21$`Ladder score` ~ data21$`Healthy life expectancy` ,data=data21)
+summary(data21_lm)
+print(data21_lm)
+
 
 
 
 ```
 
+y= -2.395 + 0.122x
 
-**$LIRI$**  
-r-sqr is 0.6 which is very sexy  what about the residuals? are they noramlly distributed? are they homogeoooo?
-**$LIRI$**  
+The R-Squared is high-middle,  0.59, which means that around 60% of the variation in the dependent variable is explained by the independent variable. 
+p-Value < 2.2e-16 - We can consider a linear model to be statistically significant only when p-Value is less that the statistical significance level, which is 0.05.
+
+we have two assumptions about the regression model:
+* residuals are homoscedastic - if the data homoscedastic we shouldn't see any connection between the points.
+* residuals are distributed normally- If the data are exactly normal, we expect the points to lie on a straight line.
+
 
 ```{r residuals}
 
 
-tidy21_lm %>% ggplot(aes(x=.fitted,y=.resid)) +
-  geom_point(alpha=0.5, color="red") + geom_hline(yintercept=0) +
-  labs(title="Residual Plot")
+data21_lm %>% ggplot(aes(x=.fitted,y=.resid, frame=FALSE)) +
+geom_point(alpha=0.1) + geom_hline(yintercept=0) +
+labs(title="Residual Plot")
 
- tidy21_lm %>% ggplot(aes(sample=.resid)) +
-  geom_qq() + geom_qq_line(col="red") +
-  labs(title="QQ Plot")
+ qqnorm(data21$'Ladder score', pch = 1, frame = FALSE)
+ qqline(data21$'Ladder score', col = "steelblue", lwd = 2)
 
 
 ```
 
 
 
-**$LIRI$** 
   
 
 #### conclusion
 
-la la la  
-**$LIRI$**  
+* The Residuals Plot shows homoscedastic.
+* our QQ plot shows that our residuals are distributed normal.
+
+To sum up this results we can determine which there is a linear correlation between score and Healthy life expectancy.
+
 
 
 ## 1.2 Connection between region and score
@@ -407,8 +415,6 @@ la la la
   
   
   
-  
-poop
   
   
   
@@ -419,7 +425,7 @@ poop
 ## 2.1 Covid19 impact
  
  
-
+determine which there is a linear corrolotaion between score and Healthy life expectancy.
 
 ## 2.2 Best year so far
  
