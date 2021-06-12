@@ -1,13 +1,30 @@
 library(tidyverse)
+source("tidy-data.R")
 
-#data collect: 
-data19 = readr::read_csv(file="data/2019.csv")
-data20 = readr::read_csv(file="data/2020.csv")
-
-# we wanted to check if the corona virus happend in 2020 effected the world happiness. 
+view(tidy20)
+view(tidy19)
+view(score_yearly)
+view(happ1920)
+view(entire_data)
+############################### covid ##################################
+# we wanted to check if the corona virus happened in 2020 effected the world happiness. 
 # our hypothesis ..... will be:
-# h0 = the world happiness was the same during 2019 and 2020
-# h1 = world happiness was higher in 2019 than in 2020
+# h0 = the world happiness was the same during 2019 (before) and 2021 (after)
+# h1 = world happiness was higher in 2019 than in 2021 - the corona virus caused the world happiness to descend
+
+t.test(x = score_yearly$score21 , y = score_yearly$score19 , paired = TRUE, alternative = "less")
+
+#p-value very high - we accept h0 , but lets look at the findings in these boxplots:
+
+entire_data %>% filter(year %in% c(19,21)) %>% ggplot(aes(y= score, x=factor(year) ,fill=factor(year)), color = year) + geom_boxplot() +
+  ggtitle("Corona Happiness 2019 and 2021") + xlab("year") + theme(legend.position="none") 
+
+# we can see that the mean of the happiness score is higher in 2021 than in 2019
+#  lets make a paird t-test to check it:
+
+t.test(x = score_yearly$score21 , y = score_yearly$score19 , paired = TRUE, alternative = "greater")
+
+###############################  end of covid ##################################
 
 # we chose a sample of 150 countries from each year data, took their score and combined all into one table.
 set.seed(0)
@@ -15,22 +32,18 @@ happ19 = data19 %>% sample_n(150) %>% select(Score) %>% mutate(year = 2019)
 happ20 = data20 %>% sample_n(150) %>% select(`Ladder score`) %>% mutate(year = 2020) %>% rename(Score = `Ladder score`)
 happ1920 = bind_rows(happ19, happ20)
 
-# lets look at the findings in this boxplots:
-
-happ1920 %>% ggplot(aes(y= Score, x=factor(year) ,fill=factor(year)), color = year) + geom_boxplot() +
-  ggtitle("Corona Happiness 2019 and 2020") + xlab("year") + theme(legend.position="none") 
-
-###### i cant change the colors !!!!
-
-
-# and lets make a t-test:
-t.test(formula = happ1920$Score ~ happ1920$year, data = happ1920, alternative = "greater")
+t.test(formula = happ1920$Score ~ happ1920$year, data = happ1920, alternative = "less")
 
 # paired t-test:
-t.test(formula = happ1920$Score ~ happ1920$year, data = happ1920, paired = TRUE, alternative = "greater")
+t.test(formula = happ1920$Score ~ happ1920$year, data = happ1920, paired = TRUE , alternative = "two.sided")
+
+
+#QT \ PT ()
 
 #p-value is more than 0.05 , try to do it paired 
 # מדגם בין מדינות דומות, פיירד = טרו 
+# יוצא פי ואליו ממש גדול - כלומר מקבלים את השארת ה 0 , אז האם להתייחס לזה? האם להמשיך לחקור את זה? או פשוט להגיד שזה לא נכון שהקורונה הורידה את השמחה ולעבור הלאה
+# לעשות דו כיווני או חד?
 
 
 # conclusion: because the p-value is .... we are going to ....
@@ -50,20 +63,19 @@ ggplot(mean_by_reg, aes(Continent, `Ladder score`)) + geom_col(aes(fill = Contin
   theme(axis.text.x=element_text(angle=45, hjust=1))+ylab("Score")
 
 
-# lets make a chi test, to see if we can assume normal distribution at the world happiness score:
-interval_breaks = c(0, 1, 2, 3, 4, 5, 6, 7) # אולי להקטין את האינטרוולים בלי 0-1
+# lets make a chi test, to see if we can assume normal distribution at the world happiness score in 2020:
 
-happy_table = data20%>%
-  mutate(happy_count = cut(`Ladder score`, breaks = interval_breaks)) %>%
-  sample_n(153) # אולי להקטין גודל מדגם
-
-mu = mean(happy_table$`Ladder score`)
-sigma = sd(happy_table$`Ladder score`)
+happy_table = tidy20%>%
+  mutate(happy_count = cut(score, breaks =  c(0, 4, 5, 6, 7, 8))) 
+#happy_table$happy_count
+view(happy_table)
+mu = mean(happy_table$score)
+sigma = sd(happy_table$score)
 
 happy_chi_prep = happy_table %>%
   count(happy_count, name = "observed") %>%
-  mutate(upper_bound = interval_breaks[-1]) %>%
-  mutate(lower_bound = interval_breaks[1:7]) %>%
+  mutate(upper_bound = c(0, 4, 5, 6, 7, 8)[-1]) %>%
+  mutate(lower_bound = c(0, 4, 5, 6, 7, 8)[1:5]) %>%
   mutate(expected_prob = pnorm(q = upper_bound, mean = mu, sd = sigma)-
            pnorm(q = lower_bound, mean = mu, sd = sigma)) %>%
   mutate(expected_prob = expected_prob/sum(expected_prob)) %>%
@@ -72,8 +84,34 @@ happy_chi_prep = happy_table %>%
 chi2_0 = sum(happy_chi_prep$chi_comp)
 chi2_0
 
+view(happy_chi_prep)
+
 #table value:
-qchisq(p = 1-0.05, df = 7-2-1)
+qchisq(p = 1-0.05, df = 5-2-1)
+
+# another try:
+
+view(tidy20)
+
+# creating groups of happiness score, to see how many measurements are actually in each group
+happy_new = tidy20 %>% 
+  mutate(new_groups = cut(score, breaks = c(0, 4, 5, 6, 7, 8)))   
+# we need to make sure that there are more than 5 in each group 
+happy_new %>% count(new_groups)
+# making a test shows whats the possibility to be in each of the groups (until 4, until 5, until 6....), according to normal distribution 
+pnorm(q = c(4, 5, 6, 7, 8), mean = mean(tidy20$score), sd = sd(tidy20$score))
+#multiple by the number of countries (153) we will get the expected cumulative 
+expected_cum = pnorm(q = c(4, 5, 6, 7, 8), mean = mean(tidy20$score), sd = sd(tidy20$score)) *153
+# to see the exact number of expediency we will have to subtract the wanted group with all of her prev
+expected = expected_cum[1:5] - c(0, expected_cum[1:4])
+
+by_group = happy_new %>% count(new_groups, name = "observed") %>% mutate(expected = expected) %>% mutate(chi = ((expected-observed)^2)/expected)
+chi_sq = sum(by_group$chi)
+chi_sq
+
+view(by_group)
+#table value:
+qchisq(p = 1-0.05, df = 5-2-1)
 
 # we got a greater value than our table value, it means we are going to reject the assumption that 
 # the world happiness distribution is normal.
@@ -86,8 +124,10 @@ ggplot(data20, aes(`Ladder score`)) + geom_density()
 # to check it, we added a new column to our data table, distinguishing between west world countries
 #(Western Europe and North America and ANZ), and the rest of the world.
 
-data20 = data20 %>% mutate(isWest = ifelse(`Regional indicator` %in% c("Western Europe", "North America and ANZ") 
+tidy20 = tidy20 %>% mutate(isWest = ifelse(`Regional indicator` %in% c("Western Europe", "North America and ANZ") 
                                            , "west world country" , "rest of the world"))
+
+set.seed(0)
 
 # after that we decided to look again at the distribution graphs: 
 # density of the west world:
@@ -106,14 +146,14 @@ ggplot((data20 %>% filter(isWest == "rest of the world") %>% filter(!(`Regional 
 # so we got two graphs that looks pretty normal. 
 # lets test it in a QQ test:
 #QQ test for the west countries:
-qqnorm((data20 %>% filter(isWest == "west world country"))$`Ladder score`, pch = 1, frame = FALSE,
+qqnorm((tidy20 %>% filter(isWest == "west world country"))$`Ladder score`, pch = 1, frame = FALSE,
        main = "Normal QQ Plot - west countries ")
-qqline((data20 %>% filter(isWest == "west world country"))$`Ladder score`, col = "steelblue", lwd = 2)
+qqline((tidy20 %>% filter(isWest == "west world country"))$`Ladder score`, col = "steelblue", lwd = 2)
 #QQ test for the rest of the world:
-qqnorm((data20 %>% filter(isWest == "rest of the world") %>% 
+qqnorm((tidy20 %>% filter(isWest == "rest of the world") %>% 
           filter(!(`Regional indicator` == "Latin America and Caribbean")))$`Ladder score`, pch = 1, frame = FALSE,
        main = "Normal QQ Plot - non west countries ")
-qqline((data20 %>% filter(isWest == "rest of the world") %>% 
+qqline((tidy20 %>% filter(isWest == "rest of the world") %>% 
          filter(!(`Regional indicator` == "Latin America and Caribbean")))$`Ladder score`, col = "steelblue", lwd = 2)
 
 # as we can see, this isn't perfectly normal, but for our research it's good enough. 
@@ -128,7 +168,7 @@ data20 %>% filter(!(`Regional indicator` == "Latin America and Caribbean")) %>%
 
 ######## PROBLEM 
 # it is not working :( i wanted to count the number of countries of the west  and all the others to show that
-# its not the same and we need to take a sample from the "else" cpuntries
+# its not the same and we need to take a sample from the "else" countries
 data20 %>% count(isWest == "west world country") #25
 data20 %>% count(isWest == "rest of the world") %>% count((`Regional indicator` == "Latin America and Caribbean"))
 #its sposed to be 107 and 25 
