@@ -29,9 +29,53 @@ t.test(x = score_yearly$score21 , y = score_yearly$score19 , paired = TRUE, alte
 
 ###############################  diff between west and else ##################################
 
+# we want to check how the area you live at will effect the happiness score. 
+# at first, we took only the data of the area and the score.
+# we took the mean of each area and placed the means in a new table.
+by_reg = tidy21 %>% select(region, score)
+mean_by_reg = aggregate(by_reg[2], list(by_reg$region), mean)  %>% rename(Region = Group.1)
+
+# now lets view the data:
+ggplot(mean_by_reg, aes(Region, score)) + geom_col(aes(fill = score), width = 0.7) +
+  ggtitle("Happiness Score By Area") + theme(legend.position="none") + 
+  theme(axis.text.x=element_text(angle=45, hjust=1))+ylab("Score") + 
+  scale_fill_gradient(low = "orchid4", high = "plum2", space = "Lab",  guide = "colourbar",  aesthetics = "fill" )
+
+# lets make a chi test, to see if we can assume normal distribution at the world happiness score in 2021:
+
+# creating groups of happiness score, to see how many measurements are actually in each group
+happy_new = tidy21 %>% 
+  mutate(new_groups = cut(score, breaks = c(0, 4, 5, 6, 7, 8)))   
+# we need to make sure that there are more than 5 in each group 
+happy_new %>% count(new_groups)
+# making a test shows whats the possibility to be in each of the groups (until 4, until 5, until 6....), according to normal distribution 
+pnorm(q = c(4, 5, 6, 7, 8), mean = mean(tidy21$score), sd = sd(tidy21$score))
+#multiple by the number of countries (153) we will get the expected cumulative 
+expected_cum = pnorm(q = c(4, 5, 6, 7, 8), mean = mean(tidy21$score), sd = sd(tidy21$score)) *149
+# to see the exact number of expediency we will have to subtract the wanted group with all of her prev
+expected = expected_cum[1:5] - c(0, expected_cum[1:4])
+
+by_group = happy_new %>% count(new_groups, name = "observed") %>% mutate(expected = expected) %>% mutate(chi = ((expected-observed)^2)/expected)
+chi_sq = sum(by_group$chi)
+chi_sq
+
+#table value:
+qchisq(p = 1-0.05, df = 5-2-1)
+
+# we got a very small p-value ! also smaller than our table value, it means we are going to accept the assumption that 
+# the world happiness distribution is normal.
+# now lets check if the mean of the west is bigger than the others
+
 west = tidy21 %>% filter(region %in% c("Western Europe", "North America and ANZ"))
 mu = mean(tidy21$score)
 t.test(x = west$score, alternative = "greater", mu = mu, conf.level = 0.99)
+
+tidy20 %>% 
+  ggplot(aes(y=score, x=factor(isWest) ,fill=(isWest), width = 0.5))  + geom_boxplot() +
+  theme(legend.position="none", axis.text.x = element_text(color = "black", size = 15 )) + xlab("") + ylab("Score")# + geom_point()
+
+
+# we get a really small p-value , so we can see we are right  in 99%!
 
 ###############################  end of diff between west and else ##################################
 
@@ -59,20 +103,9 @@ t.test(formula = happ1920$Score ~ happ1920$year, data = happ1920, paired = TRUE 
 # we can see that not only that 2019 wasn't happier than 2020, but that 2020 was even happier than 2019.
 
 
-# now lets make another test.
-# we want to check how the area you live at will effect the happiness score. 
-# at first, we took only the data of the area and the score.
-# we took the mean of each area and placed the means in a new table.
-by_reg = tidy20 %>% select(region, score)
-mean_by_reg = aggregate(by_reg[2], list(by_reg$region), mean)  %>% rename(Region = Group.1)
-
-# now lets view the data: , fill="seagreen"
-ggplot(mean_by_reg, aes(Region, score)) + geom_col(aes(fill = Region), width = 0.7) +
-  ggtitle("Happiness Score By Area") + theme(legend.position="none") + 
-  theme(axis.text.x=element_text(angle=45, hjust=1))+ylab("Score")
 
 
-# lets make a chi test, to see if we can assume normal distribution at the world happiness score in 2020:
+
 
 happy_table = tidy20%>%
   mutate(happy_count = cut(score, breaks =  c(0, 4, 5, 6, 7, 8))) 
@@ -101,33 +134,15 @@ qchisq(p = 1-0.05, df = 5-2-1)
 # another try:
 
 view(tidy20)
-
-# creating groups of happiness score, to see how many measurements are actually in each group
-happy_new = tidy20 %>% 
-  mutate(new_groups = cut(score, breaks = c(0, 4, 5, 6, 7, 8)))   
-# we need to make sure that there are more than 5 in each group 
-happy_new %>% count(new_groups)
-# making a test shows whats the possibility to be in each of the groups (until 4, until 5, until 6....), according to normal distribution 
-pnorm(q = c(4, 5, 6, 7, 8), mean = mean(tidy20$score), sd = sd(tidy20$score))
-#multiple by the number of countries (153) we will get the expected cumulative 
-expected_cum = pnorm(q = c(4, 5, 6, 7, 8), mean = mean(tidy20$score), sd = sd(tidy20$score)) *153
-# to see the exact number of expediency we will have to subtract the wanted group with all of her prev
-expected = expected_cum[1:5] - c(0, expected_cum[1:4])
-
-by_group = happy_new %>% count(new_groups, name = "observed") %>% mutate(expected = expected) %>% mutate(chi = ((expected-observed)^2)/expected)
-chi_sq = sum(by_group$chi)
-chi_sq
-
 view(by_group)
-#table value:
-qchisq(p = 1-0.05, df = 5-2-1)
+
 
 # we got a greater value than our table value, it means we are going to reject the assumption that 
 # the world happiness distribution is normal.
 # looking at the distribution graph, we noticed that it looks like two normal distributions combined together. 
 ggplot(data20, aes(`Ladder score`)) + geom_density()
 
-# we decided to check it. as you can see in the Happiness Score By Area plot, the average score of the 
+# we decided to check it. as you can see in the Happiness Score By Regoin plot, the average score of the 
 # western countries, is much higher than the others.we assumed that the area of the country effects the
 # happiness score of the country.
 # to check it, we added a new column to our data table, distinguishing between west world countries
@@ -167,12 +182,13 @@ qqline((tidy20 %>% filter(isWest == "rest of the world") %>%
 # we just need to understand that the results we are going to have are not exactly right
 # to confirm our assumption, we will make a test of hefresh tohalot:
 #lets look at the data
-data20 %>% filter(!(`Regional indicator` == "Latin America and Caribbean")) %>%
+
+tidy20 %>% filter(!(region == "Latin America and Caribbean")) %>%
   ggplot(aes(y=`Ladder score`, x=factor(isWest) ,fill=(isWest), width = 0.5))  + geom_boxplot() +
   theme(legend.position="none", axis.text.x = element_text(color = "black", size = 15 )) + xlab("") + ylab("Score")# + geom_point()
 
-data20 %>% 
-  ggplot(aes(y=`Ladder score`, x=factor(isWest) ,fill=(isWest), width = 0.5))  + geom_boxplot() +
+tidy20 %>% 
+  ggplot(aes(y=score, x=factor(isWest) ,fill=(isWest), width = 0.5))  + geom_boxplot() +
   theme(legend.position="none", axis.text.x = element_text(color = "black", size = 15 )) + xlab("") + ylab("Score")# + geom_point()
 
 
@@ -189,8 +205,7 @@ data20 %>% count(isWest == "rest of the world") %>% count((`Regional indicator` 
 #and now - the t-test:
 t.test(x = (data20 %>% filter(isWest == "west world country"))$`Ladder score`,
        y = ((data20 %>% filter(isWest == "rest of the world") %>% filter(!(`Regional indicator` == "Latin America and Caribbean")))
-            %>% sample_n(25))$`Ladder score`,
-       paired = TRUE, alternative = "greater")
+            %>% sample_n(25))$`Ladder score`, paired = TRUE, alternative = "greater")
 
 ## we can try to do paired = false, and than we wont have to take a sample of 25 countries 
 # it worked!!!
