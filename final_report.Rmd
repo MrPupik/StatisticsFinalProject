@@ -25,7 +25,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 > <img src="resources/stairs.jpg"/>
 
-## [Introduction:]{style="color: #6600ff"}
+# Introduction
 
 This article is a summery of our statistics project ([github
 link](https://github.com/MrPupik/StatisticsFinalProject/)), where we
@@ -69,12 +69,13 @@ affects it and how. Questions we will focus on:
 -   Are we getting happier ? trends in mean *score* over the years.\
 -   Changes in happiness per country. Which countries changes the most?
 
-## [Data exploreation and tidying:]{style="color: #6600ff"}
+# Data exploreation and tidying
 
 Initial setup and data import:
 
 ```{r import, results="hide", message=FALSE}
 library(tidyverse)
+library(gridExtra)
 data15 = readr::read_csv(file="data/2015.csv")
 data16 = readr::read_csv(file="data/2016.csv")
 data17 = readr::read_csv(file="data/2017.csv")
@@ -87,58 +88,58 @@ data21 = readr::read_csv(file="data/2021.csv")
 Now let's have a glimpse of our dataset. we have 7 files, one for each
 year (2015-2021)
 
-### Glimpse all data: {.tabset}
+## Glimpse all data: {.tabset}
 
-#### 2015
+### 2015
 
 ```{r}
 
 glimpse(data15)
 ```
 
-#### 2016
+### 2016
 
 ```{r read2016}
 
 glimpse(data16)
 ```
 
-#### 2017
+### 2017
 
 ```{r read2017}
 
 glimpse(data17)
 ```
 
-#### 2018
+### 2018
 
 ```{r read2018}
 
 glimpse(data18)
 ```
 
-#### 2019
+### 2019
 
 ```{r read2019}
 
 glimpse(data19)
 ```
 
-#### 2020
+### 2020
 
 ```{r read2020}
 
 glimpse(data20)
 ```
 
-#### 2021
+### 2021
 
 ```{r read2021}
 
 glimpse(data21)
 ```
 
-### Data Issues and setbacks
+## Data Issues and setbacks
 
 1.  **Variable names:** names are not consistent between the years, for
     [[example:\\\\](example:\\){.uri}]([example:\\](example:\){.uri}){.uri}
@@ -149,9 +150,9 @@ glimpse(data21)
 3.  **Variable scale**: `health` is sometimes displayed in years, other
     times in year / 100
 
-### Data tidying
+## Data tidying
 
-#### The Variables we are going to use in our research
+### The Variables we are going to use in our research
 
 *Variables mutated by our team marked with an asterisk\**
 
@@ -209,12 +210,12 @@ arrAllData = list(data15, data16, data17, data18, data19, data20 ,data21)
 
 ```
 
-#### Iterate over all data to create unified data-frames and one combined big data-frame
+#### Iterate over all data to create unified data-frames and one combined dataframe
 
 Now that we have an array containing the entire data, we can iterate over it and tidy all:
 
 
-```{r for loop, message=FALSE, results='hold'}
+```{r for loop, message=FALSE, results='hide'}
 
 
 current_year = 15
@@ -236,10 +237,13 @@ for (i in c(1:length(arrAllData))) {
                         health=contains("Health"), freedom=contains("Freedom"),
                         trust=matches("Corruption", ignore.case = TRUE),  dystopia=matches("Dystopia", ignore.case = TRUE))
   
+  # add year coulmn (as factor)
+  arrAllData[[i]] = arrAllData[[i]] %>% mutate(year = current_year) %>% mutate(year = factor(year))
+  
   # speciel case - some of the years don't have region
   arrAllData[[i]] = arrAllData[[i]] %>% rename(region=matches(".*region.*", ignore.case = TRUE))
   
-  arrAllData[[i]] = arrAllData[[i]] %>% mutate(year = current_year)
+  
   
   # select the coulmns we need. if no region - create region column and fill it with NA
   if (any(names(arrAllData[[i]]) == 'region'))
@@ -250,6 +254,10 @@ for (i in c(1:length(arrAllData))) {
   {
     arrAllData[[i]] = arrAllData[[i]] %>% select(country, score, gdp, trust, health, freedom, trust, year) %>% mutate(region = NA)
   }
+  
+  # add isIsrael variable
+   arrAllData[[i]] = arrAllData[[i]] %>% 
+    mutate(isIsrael = ifelse(country == "Israel", 1, 0)) %>% mutate(isIsrael = factor(isIsrael))
   
   # fill score_yearly
   if (current_year > 15)
@@ -277,13 +285,13 @@ Almost done, now let's create our dataframes:
 ```{r final tidy, message=FALSE, results='hold'}
 
 # convert year to factor, add isIsrael boolean variable.
-tidy15 = arrAllData[[1]]  %>% mutate(year = factor(year))  %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
-tidy16 = arrAllData[[2]]  %>% mutate(year = factor(year))  %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
-tidy17 = arrAllData[[3]]  %>% mutate(year = factor(year))  %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
-tidy18 = arrAllData[[4]]  %>% mutate(year = factor(year))  %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
-tidy19 = arrAllData[[5]]  %>% mutate(year = factor(year))  %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
-tidy20 = arrAllData[[6]]  %>% mutate(year = factor(year))  %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
-tidy21 = arrAllData[[7]]  %>% mutate(year = factor(year))  %>% mutate(isIsrael = ifelse(country == "Israel", 1, 0))
+tidy15 = arrAllData[[1]]  
+tidy16 = arrAllData[[2]]  
+tidy17 = arrAllData[[3]]  
+tidy18 = arrAllData[[4]]  
+tidy19 = arrAllData[[5]]  
+tidy20 = arrAllData[[6]]  
+tidy21 = arrAllData[[7]]  
 
 # merge all to one table
 entire_data = bind_rows(tidy15 ,tidy16, tidy17, tidy18, tidy19, tidy20, tidy21)
@@ -293,7 +301,7 @@ some_data = bind_rows(tidy15,tidy18, tidy21)
 ```
 
 
-### results {.tabset}
+## results {.tabset}
 
 here is the tidy data:
 
@@ -314,4 +322,264 @@ entire_data
 ```{r score yearly}
 score_yearly
 ```
+
+
+# 1. Happiness 2021
+
+why are some countries happier than others? 
+
+## 1.1 connection between diffrent variables and score
+
+
+```{r linar all, message= FALSE, echo=FALSE,  ,out.width="50%"}
+gdp_plot = tidy21 %>% ggplot(aes(x=gdp, y=score, shape=isIsrael)) + geom_point() + geom_smooth()
+health_plot = tidy21 %>% ggplot(aes(x=health, y=score, shape=isIsrael)) + geom_point() + geom_smooth()
+freedom_plot = tidy21 %>% ggplot(aes(x=freedom, y=score, shape=isIsrael)) + geom_point() + geom_smooth()
+trust_plot = tidy21 %>% ggplot(aes(x=trust, y=score, shape=isIsrael)) + geom_point() + geom_smooth()
+gdp_plot +  theme(text = element_text(size=20))
+health_plot + theme(text = element_text(size=20))
+freedom_plot + theme(text = element_text(size=20))
+trust_plot + theme(text = element_text(size=20))
+
+
+```
+
+**$LIRI$**  
+connection of gdp+freedom looks liniar, trust not linar, but is health liniat? lets check yay !!  
+**$LIRI$**  
+
+
+### Linair model for score ~ health
+
+**$LIRI$**  
+short explanation of linar regression -> goal is high r-squered
+**$LIRI$**  
+
+
+
+
+```{r liniar_model}
+
+# use liniar model with geom_smooth
+tidy21 %>% ggplot(aes(y=score , x=health))+
+geom_point(color="lightskyblue")+ scale_y_log10()+
+geom_smooth(method = "lm",color="black") + theme(text= element_text(size=20))
+
+# liniar regression test
+tidy21_lm = lm(formula =tidy21$score ~ tidy21$health ,data=tidy21)
+summary(tidy21_lm)
+
+
+
+```
+
+
+**$LIRI$**  
+r-sqr is 0.6 which is very sexy  what about the residuals? are they noramlly distributed? are they homogeoooo?
+**$LIRI$**  
+
+```{r residuals}
+
+
+tidy21_lm %>% ggplot(aes(x=.fitted,y=.resid)) +
+  geom_point(alpha=0.5, color="red") + geom_hline(yintercept=0) +
+  labs(title="Residual Plot")
+
+ tidy21_lm %>% ggplot(aes(sample=.resid)) +
+  geom_qq() + geom_qq_line(col="red") +
+  labs(title="QQ Plot")
+
+
+```
+
+
+
+**$LIRI$** 
+  
+
+#### conclusion
+
+la la la  
+**$LIRI$**  
+
+
+## 1.2 Connection between region and score
+  
+  
+  
+  
+  
+poop
+  
+  
+  
+  
+  
+# 2. Happiens over the years
+
+## 2.1 Covid19 impact
+ 
+ 
+
+
+## 2.2 Best year so far
+ 
+To comapre the happiness between the years, we started with a simple histogram - showing what scores are common for every year:
+
+```{r yearly_histogram}
+some_data %>% ggplot(aes(x=`score`, color=year)) + geom_density()
+```
+
+it seems that the world is getting happier, higher scores are getting more common. let's see if we can see this effect in the mean score of every year:
+
+
+```{r compare mean1 }
+entire_data %>% ggplot(aes(y=score, x=year))  + geom_boxplot()
+```
+
+This is a bit crowded, lets go back to focus on 2015, 2018, 2021
+
+
+```{r compare mean2 }
+some_data %>% ggplot(aes(y=score, x=year,fill=year))  + geom_boxplot()
+```
+
+This plot can show us three important things:  
+1. Mean is higher in 2021  
+2. Variance is lower in 2021  
+3. Mean is higher in 2018 compared with 2015, but variance is the same  
+  
+It does seem 2021 has been better, for most countries.  
+Generally, the world is getting happier and during the pandemic, this process accelerated !  
+  
+It might be that when things get tough, perception of happiness increases because our day to day   trouble seem less significant.  
+
+maybe we can try isolate what in those years made pepole happier  
+
+### Happiness over the years - diffrent variables
+
+
+```{r over_time, out.width="50%", echo=FALSE, message=FALSE, warning=FALSE}
+some_data %>% ggplot(aes(x=health, y=score, color=year, shape=isIsrael))  +
+  geom_point(size=2) + labs(title="health over the years") + theme(text= element_text(size=20))
+some_data %>% ggplot(aes(x=trust, y=score, color=year, shape=isIsrael)) +
+  geom_point(size=2) + labs(title="trust over the years") + theme(text= element_text(size=20))
+some_data %>% ggplot(aes(x=freedom, y=score, color=year, shape=isIsrael))  +
+  geom_point(size=2) + labs(title="freedom over the years") + theme(text= element_text(size=20))
+some_data %>% ggplot(aes(x=gdp, y=score, color=year, shape=isIsrael))  +
+  geom_point(size=2) + labs(title="gdp over the years") + theme(text= element_text(size=20))
+```
+
+#### gdp and health
+These are absolute scalse, however it seems the vairance of them drasticly decreased on 2021.
+Sience it is of course unlikly that the population has started suddnly living more, we conclude our conversion of these variables (diveding by 100) was wrong.
+We couldn't find a documantion explaining the diffrent scales, and sadly this means we can not determine conclusions based on 2020's and 2021's `gdp` and `health`.
+
+#### freedom and trust
+
+As logic dectates, this variables are connected.  
+It seems that during the unprecedented global pandemic, goverment `trust` level and since of `freedom` **increased**.
+This can begin to explain the mental state of the people of the diffrent countries, leading happiness score to increase.
+
+
+## 2.3 Changes in Happiness per country
+
+
+In order to see improvments and declines in happiness vor every country, we will introduce new variable - `diff`: diffrence in score over time
+
+```{r diff prepare, message=FALSE, results="hide"}
+
+
+ # select score only
+ score15 = tidy15 %>% select(country, score) 
+ score18 = tidy18 %>% select (country, score) 
+ score21 = tidy21 %>% select (country, score) %>% rename(score.21 = score)
+
+ # join the years
+diff_data = inner_join(x=score15, y=score18, by="country", suffix = c(".15", ".18"))
+diff_data = inner_join(x=diff_data, y=score21, by="country")
+
+# create diff variables
+diff_data = diff_data %>% mutate(diff.18 = score.18-score.15) %>% mutate(diff.21 = score.21-score.18) %>%
+          mutate(diff.total = score.21-score.15)
+diff_total = diff_data %>% select(country, diff.total)
+
+# insert diff total to the 2021 data
+diff21 = inner_join(tidy21, diff_total, by="country")
+
+# add diff.abs. absolute of diff.total
+diff21 = diff21 %>% mutate(diff.abs = abs(diff.total))
+
+
+```
+
+
+### results
+
+```{r diff result 1}
+diff_data
+diff21
+```
+
+This is how `diff` per country looks like:
+
+```{r diff result 2}
+diff21 %>% ggplot(aes(x=score, y=diff.total)) + geom_point() + geom_smooth()
+
+```
+
+### Poor becamoe even poorer {.tabset}
+
+It seems that as lower the happiness - the biggest the dif. pracicularly - the negative diff.
+
+To examine this. we will look at two plots - boxplot for diff.total, 
+and boxplot for diff.abs. The goal is to see both direction of the change and value of it.
+
+
+```{r diff result 3, results='hide', message=FALSE}
+
+
+# divide scores into 3 groups - low, medium and high
+scoreLevel = function (scores){
+ sapply(scores, function(scores){
+   if (scores < 4){
+     return('low')
+   }
+   if(scores<6){
+     return('medium')
+   }
+   return('high')
+ })
+  
+}
+
+diff21 = diff21 %>% mutate(score_level = scoreLevel(diff21$score)) %>%
+        mutate(score_level = factor(score_level, levels = c('low', 'medium', 'high')))
+
+
+```
+
+#### diffreance
+
+```{r diff result 4}
+# boxplot of dif.total
+diff21 %>% ggplot(aes(x=score_level, y=diff.total, color=score_level)) + geom_boxplot()
+
+# means of each group
+diff21 %>% group_by(score_level) %>% summarise(mean=mean(diff.total))
+```
+
+#### absolute diffreance
+
+```{r diff result 5}
+# boxplot of dif.abs
+diff21 %>% ggplot(aes(x=score_level, y=diff.abs, color=score_level)) + geom_boxplot()
+
+```
+
+
+
+### conclusion
+First, is clear both that the difference for low-happiness countries is negative, while for medium and high, it is positive.
+Second, the happier a country is - the it's score tends to change.
 
