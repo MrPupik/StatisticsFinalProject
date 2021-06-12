@@ -1,12 +1,13 @@
 library(tidyverse)
 source("tidy-data.R")
 
-view(tidy20)
+view(tidy21)
 view(tidy19)
 view(score_yearly)
 view(happ1920)
 view(entire_data)
 ############################### covid ##################################
+
 # we wanted to check if the corona virus happened in 2020 effected the world happiness. 
 # our hypothesis ..... will be:
 # h0 = the world happiness was the same during 2019 (before) and 2021 (after)
@@ -25,6 +26,14 @@ entire_data %>% filter(year %in% c(19,21)) %>% ggplot(aes(y= score, x=factor(yea
 t.test(x = score_yearly$score21 , y = score_yearly$score19 , paired = TRUE, alternative = "greater")
 
 ###############################  end of covid ##################################
+
+###############################  diff between west and else ##################################
+
+west = tidy21 %>% filter(region %in% c("Western Europe", "North America and ANZ"))
+mu = mean(tidy21$score)
+t.test(x = west$score, alternative = "greater", mu = mu, conf.level = 0.99)
+
+###############################  end of diff between west and else ##################################
 
 # we chose a sample of 150 countries from each year data, took their score and combined all into one table.
 set.seed(0)
@@ -54,11 +63,11 @@ t.test(formula = happ1920$Score ~ happ1920$year, data = happ1920, paired = TRUE 
 # we want to check how the area you live at will effect the happiness score. 
 # at first, we took only the data of the area and the score.
 # we took the mean of each area and placed the means in a new table.
-by_reg = data20 %>% select(`Regional indicator`, `Ladder score`)
-mean_by_reg = aggregate(by_reg[2], list(by_reg$`Regional indicator`), mean)  %>% rename(Continent = Group.1)
+by_reg = tidy20 %>% select(region, score)
+mean_by_reg = aggregate(by_reg[2], list(by_reg$region), mean)  %>% rename(Region = Group.1)
 
 # now lets view the data: , fill="seagreen"
-ggplot(mean_by_reg, aes(Continent, `Ladder score`)) + geom_col(aes(fill = Continent), width = 0.7) +
+ggplot(mean_by_reg, aes(Region, score)) + geom_col(aes(fill = Region), width = 0.7) +
   ggtitle("Happiness Score By Area") + theme(legend.position="none") + 
   theme(axis.text.x=element_text(angle=45, hjust=1))+ylab("Score")
 
@@ -127,8 +136,6 @@ ggplot(data20, aes(`Ladder score`)) + geom_density()
 tidy20 = tidy20 %>% mutate(isWest = ifelse(`Regional indicator` %in% c("Western Europe", "North America and ANZ") 
                                            , "west world country" , "rest of the world"))
 
-set.seed(0)
-
 # after that we decided to look again at the distribution graphs: 
 # density of the west world:
 ggplot((data20 %>% filter(isWest == "west world country")), aes(`Ladder score`)) + geom_density() + 
@@ -164,6 +171,11 @@ data20 %>% filter(!(`Regional indicator` == "Latin America and Caribbean")) %>%
   ggplot(aes(y=`Ladder score`, x=factor(isWest) ,fill=(isWest), width = 0.5))  + geom_boxplot() +
   theme(legend.position="none", axis.text.x = element_text(color = "black", size = 15 )) + xlab("") + ylab("Score")# + geom_point()
 
+data20 %>% 
+  ggplot(aes(y=`Ladder score`, x=factor(isWest) ,fill=(isWest), width = 0.5))  + geom_boxplot() +
+  theme(legend.position="none", axis.text.x = element_text(color = "black", size = 15 )) + xlab("") + ylab("Score")# + geom_point()
+
+
 # to make the t-test we would like to take the same length of the data
 
 ######## PROBLEM 
@@ -190,7 +202,6 @@ t.test(x = (data20 %>% filter(isWest == "west world country"))$`Ladder score`,
 # conclusion ! 
 # we can see that the p-value < 2.2e-16 --> this is really small,
 # so we can confirm our assumption that living in west countries raieses your happiness score. 
-
 
 
 
