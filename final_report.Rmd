@@ -39,8 +39,8 @@ Since the data of each year came separately, and included different
 categories and measurements - the first stage of our work is to **tidy
 our data**. Make it ready to be worked on.
 
-**Note**: When we first introduce a variable and how we will adress it
-in this article, we will do so by the following structre: `varible`
+**Note**: When we first introduce a variable and how we will address it
+in this article, we will do so by the following structure: `varible`
 (*our term*) for example, `happiness score` (*score*)
 
 The next two stages are the heart of our article: <u> Visualization and
@@ -142,9 +142,8 @@ glimpse(data21)
 ## Data Issues and setbacks
 
 1.  **Variable names:** names are not consistent between the years, for
-    [[example:\\\\](example:\\){.uri}]([example:\\](example:\){.uri}){.uri}
-    `Happiness Score` in 2015, `Happiness.Score` in 2017, `Score` of
-    2018, etc... all refer to the same variable.\
+    example `Happiness Score` in 2015, `Happiness.Score` in 2017, `Score` of
+    2018, etc... all refer to the same variable.
 2.  **Number of variables**: not all the years contains the same
     variables.
 3.  **Variable scale**: `health` is sometimes displayed in years, other
@@ -515,6 +514,10 @@ diff21 = diff21 %>% mutate(diff.abs = abs(diff.total))
 
 
 ### results
+
+`diff18`: diffrence between score of 2015 and 2018  
+`diff21`: diffrence between score of 2018 and 2021 
+`diff.total`: diffrence between score of 2015 and 2021 
 
 ```{r diff result 1}
 diff_data

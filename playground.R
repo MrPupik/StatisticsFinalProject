@@ -40,7 +40,7 @@ diff21 = diff21 %>% mutate(diff.abs = abs(diff.total))
 
 diff21 %>% ggplot(aes(x=diff.total)) + geom_density()
 
-diff21 %>% ggplot(aes(x=abs, y=score)) + geom_point() + geom_smooth()
+diff21 %>% ggplot(aes(x=score, y=diff.abs)) + geom_point() + geom_smooth()
 
 diff21 %>% ggplot() + geom_qq(aes(sample=diff21$diff.total))
 
@@ -62,7 +62,7 @@ scoreLevel = function (scores){
 diff21 = diff21 %>% mutate(score_level = scoreLevel(diff21$score)) %>%
         mutate(score_level = factor(score_level, levels = c('low', 'medium', 'high')))
 
-diff21 %>% ggplot(aes(x=score_level, y=diff.total, color=score_level)) + geom_boxplot()
+diff21 %>% ggplot(aes(x=score_level, y=diff.abs, color=score_level)) + geom_boxplot()
 
 diff21 %>% group_by(score_level) %>% summarise(mean=mean(diff.total))
 mean(filter(diff21,score_level=='high')$diff.total)
