@@ -40,15 +40,15 @@ categories and measurements - the first stage of our work is to **tidy
 our data**. Make it ready to be worked on.
 
 **Note**: When we first introduce a variable and how we will address it
-in this article, we will do so by the following structure: `varible`
-(*our term*) for example, `happiness score` (*score*)
+in this article, we will do so by the following structure:  
+`varible` (*our term*) for example, `happiness score` (*score*)
 
 The next two stages are the heart of our article: <u> Visualization and
 modeling.</u> We'll be Waking visualizations to explore the data,
 theorize about what we see, and proove/disproove our theories using
 statistical models and methods we learned throught the course.
 
-Our goal is to explore interesting facts of world happiness, what
+Our goal is to explore interesting facts of world happiness and what
 affects it and how. Questions we will focus on:
 
 #### 1. Why are some countries happier than others? What makes a country "happy"?
@@ -282,7 +282,7 @@ Almost done, now let's create our dataframes:
 
 ```{r final tidy, message=FALSE, results='hold'}
 
-# convert year to factor, add isIsrael boolean variable.
+# tidy data variables
 tidy15 = arrAllData[[1]]  
 tidy16 = arrAllData[[2]]  
 tidy17 = arrAllData[[3]]  
@@ -372,14 +372,14 @@ print(data21_lm)
 
 ```
 
-### $$ \hat{Y}: y = -2.395 + 0.122x $$
+### $$ \hat{y} = -2.395 + 0.122x $$
 
-The R-Squared is 0.59, which is considered high. This means that around 60% of the variation in the dependent variable is explained by the independent variable. 
-p-Value < 2.2e-16 - We can consider a linear model to be statistically significant only when p-Value is less that the statistical significance level, which is 0.05.
-
+The R-Squared is 0.59, which is considered high. This means that around 60% of the variation in the dependent variable is explained by the independent variable.   
+`p-Value` < 2.2e-16 - We can consider a linear model to be statistically significant only when p-Value is less that the statistical significance level, which is 0.05.  
+  
 we have two assumptions about the regression model:  
-** residuals are homoscedastic - if the data homoscedastic we shouldn't see any   connection between the points.  
-** residuals are distributed normally- If the data are exactly normal, we expect the   points to lie on a straight line on the QQ graph.  
+* residuals are homoscedastic - if the data homoscedastic we shouldn't see any   connection between the points.  
+* residuals are distributed normally- If the data are exactly normal, we expect the   points to lie on a straight line on the QQ graph.  
 
 
 ```{r residuals}
@@ -464,8 +464,8 @@ Chi actual result is smaller than theoretical one ! it means we are going to acc
 What we're now interesting in is weather western countries are happier than non-western countries.
 We can preform hypothesis testing to examine this.
 
-$h_0$: Mean of western countries score equals to score's $\mu$ (expectation)
-$h_1$: Mean of western countries score greater then score's $\mu$ (expectation)
+$h_0$: Mean of western countries score equals to score's $\mu$ (expectation)  
+$h_1$: Mean of western countries score greater then score's $\mu$ (expectation)  
 
 ```{r region 3}
 
@@ -510,7 +510,8 @@ $h_{1}$: world happiness was higher in 2019 than in 2021 - the corona virus caus
 t.test(x = score_yearly$score21 , y = score_yearly$score19 , paired = TRUE, alternative = "less")
 ```
 
-We can see `p-value` is very high. This means we cannot reject h_0. To our suprise - The corona pandemic did not impact happiness like we thought.
+We can see `p-value` is very high. This means we cannot reject $h_0$.  
+To our suprise - The corona pandemic did not impact happiness like we thought.
 
 Lets take a look at the findings with boxplots:
 
@@ -553,16 +554,16 @@ some_data %>% ggplot(aes(y=score, x=year,fill=year))  + geom_boxplot()
 ```
 
 This plot can show us three important things:  
-1. Mean is higher in 2021  
-2. Variance is lower in 2021  
-3. Mean is higher in 2018 compared with 2015, but variance is the same  
+1. `Mean` is higher in 2021  
+2. `Variance` is lower in 2021  
+3. `Mean` is higher in 2018 compared with 2015, but variance is the same  
   
 It does seem 2021 has been better, for most countries.  
 Generally, the world is getting happier and during the pandemic, this process accelerated !  
   
-It might be that when things get tough, perception of happiness increases because our day to day   trouble seem less significant.  
+It might be the case that when things get tough, perception of happiness increases because our day to day trouble seem less significant.  
 
-maybe we can try isolate what in those years made pepole happier  
+Maybe we can isolate what in those years made people happier:
 
 ### Happiness over the years - diffrent variables
 
@@ -579,15 +580,19 @@ some_data %>% ggplot(aes(x=gdp, y=score, color=year, shape=isIsrael))  +
 ```
 
 #### gdp and health
-These are absolute scalse, however it seems the vairance of them drasticly decreased on 2021.
-Sience it is of course unlikly that the population has started suddnly living more, we conclude our conversion of these variables (diveding by 100) was wrong.
-We couldn't find a documantion explaining the diffrent scales, and sadly this means we can not determine conclusions based on 2020's and 2021's `gdp` and `health`.
+These are absolute scales, however it seems the variance of them drastically decreased on 2021.
+Since it is of course unlikely that the population has started suddenly living more, we conclude our conversion of these variables (dividing by 100) was wrong.
+We couldn't find a documentation explaining the different scales, and sadly this means we can not determine conclusions based on 2020's and 2021's `gdp` and `health`.
 
 #### freedom and trust
 
-As logic dectates, this variables are connected.  
-It seems that during the unprecedented global pandemic, goverment `trust` level and since of `freedom` **increased**.
-This can begin to explain the mental state of the people of the diffrent countries, leading happiness score to increase.
+As logic dictates, this variables are connected.  
+It seems that during the unprecedented global pandemic, government `trust` level and since of `freedom` **increased**.
+
+This is incredible - with government restrictions, limitations and conspiracy theories in mind. For some reason the citizens felt they can trust their leadership.
+The `freedom` spike might be connected to suffering from lock-downs and having them removed. Similar to the  jewish tail ["the rabbi, the farmer and the sheep"](http://www.morim.com/ravez2.pdf)
+
+This can begin to explain the mental state of the people of the different countries, leading happiness score to increase.
 
 
 ## 2.3 Changes in Happiness per country
@@ -650,10 +655,10 @@ diff21 %>% ggplot(aes(x=score, y=diff.total)) + geom_point() + geom_smooth()
 
 ### Poor becamoe even poorer {.tabset}
 
-It seems that as lower the happiness - the biggest the dif. pracicularly - the negative diff.
+It seems that as lower the happiness - the biggest the `diff`. pracicularly - the negative `diff`.
 
-To examine this. we will look at two plots - boxplot for diff.total, 
-and boxplot for diff.abs. The goal is to see both direction of the change and value of it.
+To examine this. we will look at two plots - boxplot for `diff.total`, 
+and boxplot for `diff.abs`. The goal is to see both direction of the change and value of it.
 
 
 ```{r diff result 3, results='hide', message=FALSE}
@@ -699,11 +704,18 @@ diff21 %>% ggplot(aes(x=score_level, y=diff.abs, color=score_level)) + geom_boxp
 
 
 
-### Conclusion
+### Results
 First, it is clear both that the difference for low-happiness countries is negative, while for medium and high, it is positive.  
 
 Second, the score of happier countries tend to change less.
 
+
+
+# Conclusion
+
+We hope you enjoyed our research. We have answered many questions, and revoked others.  
+We have learned that happiness is very hard to measure. And is extremely subjective.  
+We have also learned to never use "world happens report" data again, as it is not very tidy and poorly documented.
 
 
 > <img src="resources/dolls.jpg"/>
