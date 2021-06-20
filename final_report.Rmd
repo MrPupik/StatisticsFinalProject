@@ -31,44 +31,40 @@ This article is a summery of our statistics project ([github
 link](https://github.com/MrPupik/StatisticsFinalProject/)), where we
 analyze the results of [world happiness
 reports (link)](https://worldhappiness.report/).
-In our research we focused on the years 2015 to 2021. The Datasets we
+In our research we focused on the years 2015 to 2021. The datasets we
 used can be found [here on
-Kaggle](https://www.kaggle.com/mathurinache/world-happiness-report-20152021)
+Kaggle.](https://www.kaggle.com/mathurinache/world-happiness-report-20152021)
 
-Since the data of each year came separately, and included different
-categories and measurements - the first stage of our work is to **tidy
-our data**. Make it ready to be worked on.
-
-**Note**: When we first introduce a variable and how we will address it
-in this article, we will do so by the following structure:  
-`varible` (*our term*) for example, `happiness score` (*score*)
+Since the data of each year came separately and included different
+categories and measurements, the first stage of our work is to **tidy
+our data**. 
 
 The next two stages are the heart of our article: <u> Visualization and
-modeling.</u> We'll be Waking visualizations to explore the data,
-theorize about what we see, and proove/disproove our theories using
-statistical models and methods we learned throught the course.
+modeling.</u> We will be making visualizations to explore the data,
+theorize about what we see, and prove/disprove our theories using
+statistical models and methods we learned throughoutthe course.
 
 Our goal is to explore interesting facts of world happiness and what
 affects it and how. Questions we will focus on:
 
 #### 1. Why are some countries happier than others? What makes a country "happy"?
 
--   Connection between `life expectancy` (*health*) and *score*.
+-   The connection between `life expectancy` (*health*) and *score*.
     Specificity, is the connection linear? (linear regression model)
--   Connection between the `region or continent` (*region*) and
-    happiness (hypothesis testing, godness of fit)
+-   The connection between the `region or continent` (*region*) and
+    happiness (hypothesis testing, goodness of fit)
 
-#### 2. Happiens over the years
+#### 2. Happiness over the years
 
--   Did Covid19 made our world sad? comparison of 2019 and 2020
+-   Did Covid19 made our world sad? Comparison of 2019 and 2020
     *scores*\
--   Which year was the happiest? mean *score* over time.\
+-   Which year was the happiest? Mean *score* over time.\
 -   Connection between `GDP per capita` (*gdp*) and happiness - all
     years combined.
--   Are we getting happier ? trends in mean *score* over the years.\
--   Changes in happiness per country. Which countries changes the most?
+-   Are we getting happier? Trends in mean *score* over the years.\
+-   Changes in happiness per country. Which countries change the most?
 
-# Data exploreation and tidying
+# Data exploration and tidying
 
 Initial setup and data import:
 
@@ -154,36 +150,34 @@ glimpse(data21)
 
 *Variables mutated by our team marked with an asterisk\**
 
-+------------+-------------------------------------+------+----------+
-| Name       | Description                         | Type | Include  |
-|            |                                     |      | in years |
-+============+=====================================+======+==========+
-| country    | name of the country                 | char | all      |
-+------------+-------------------------------------+------+----------+
-| region     | geographical r egion/continent      | char | 20       |
-|            |                                     |      | 15-2016, |
-|            |                                     |      | 2        |
-|            |                                     |      | 018-2021 |
-+------------+-------------------------------------+------+----------+
-| score      | absolute happiness score            | do   | all      |
-|            |                                     | uble |          |
-+------------+-------------------------------------+------+----------+
-| gdp        | GDP per capita                      | do   | all      |
-|            |                                     | uble |          |
-+------------+-------------------------------------+------+----------+
-| trust      | level of trust in the government    | do   | all      |
-|            | (subjective perception of the       | uble |          |
-|            | population)                         |      |          |
-+------------+-------------------------------------+------+----------+
-| health     | Life expectancy (years / 100)       | do   | all      |
-|            |                                     | uble |          |
-+------------+-------------------------------------+------+----------+
-| freedom    | Subjective score of individual      | do   | all      |
-|            | freedom                             | uble |          |
-+------------+-------------------------------------+------+----------+
-| year\*     | year of the report                  | do   | all      |
-|            |                                     | uble |          |
-+------------+-------------------------------------+------+----------+
++------------+-------------------------------------+--------+--------------+
+| Name       | Description                         | Type   | Include      |
+|            |                                     |        | in years     |
++============+=====================================+========+==============+
+| country    | name of the country                 | char   | all          |
++------------+-------------------------------------+--------+--------------+
+| region     | geographical region/continent       | char   | 2015 - 2016, |    
+|            |                                     |        | 2018 - 2021  |
++------------+-------------------------------------+--------+--------------+
+| score      | absolute happiness score            | double |    all       |
+|            |                                     |        |              |
++------------+-------------------------------------+--------+--------------+
+| gdp        | GDP per capita                      | double |    all       |
+|            |                                     |        |              |
++------------+-------------------------------------+--------+--------------+
+| trust      | level of trust in the government    | double |    all       |
+|            | (subjective perception of the       |        |              |
+|            | population)                         |        |              |
++------------+-------------------------------------+--------+--------------+
+| health     | Life expectancy (years / 100)       | double |    all       |
+|            |                                     |        |              |
++------------+-------------------------------------+--------+--------------+
+| freedom    | Subjective score of individual      | double |    all       |
+|            | freedom                             |        |              |
++------------+-------------------------------------+--------+--------------+
+| year\*     | year of the report                  | double |    all       |
+|            |                                     |        |              |
++------------+-------------------------------------+--------+--------------+
 
 #### Adjust scale and type of variables
 
@@ -210,7 +204,7 @@ arrAllData = list(data15, data16, data17, data18, data19, data20 ,data21)
 
 #### Iterate over all data to create unified data-frames and one combined dataframe
 
-Now that we have an array containing the entire data, we can iterate over it and tidy all:
+Now that we have an array containing the entire data, we can iterate over it and tidy it up:
 
 
 ```{r for loop, message=FALSE, results='hide'}
@@ -278,7 +272,7 @@ for (i in c(1:length(arrAllData))) {
 ```
 
 
-Almost done, now let's create our dataframes:
+Almost done, now let us create our dataframes:
 
 ```{r final tidy, message=FALSE, results='hold'}
 
@@ -299,7 +293,7 @@ some_data = bind_rows(tidy15,tidy18, tidy21)
 ```
 
 
-## Results {.tabset}
+## Tidy datasets {.tabset}
 
 here is the tidy data:
 
@@ -324,9 +318,9 @@ score_yearly
 
 # 1. Happiness 2021
 
-why are some countries happier than others? 
+Why are some countries happier than others? 
 
-## 1.1 Connection between diffrent variables and score
+## 1.1 Connection between different variables and score
 
 
 ```{r linar all, message= FALSE, echo=FALSE,  ,out.width="50%"}
@@ -342,11 +336,11 @@ trust_plot + theme(text = element_text(size=20))
 
 ```
 
-The connection between gdp and freedom looks linear. In addition trust looks not linear, but is health linear? lets check!
+The correlations `score~gdp` and `score~freedom` looks linear. `score~trust` does not look linear, but is `score~health` linear? lets check!
 
 
 
-### Linair model for score ~ health
+### Linear model for score ~ health
 
 
 The relation between the health and the score looks like:
@@ -374,12 +368,12 @@ print(data21_lm)
 
 ### $$ \hat{y} = -2.395 + 0.122x $$
 
-The R-Squared is 0.59, which is considered high. This means that around 60% of the variation in the dependent variable is explained by the independent variable.   
-`p-Value` < 2.2e-16 - We can consider a linear model to be statistically significant only when p-Value is less that the statistical significance level, which is 0.05.  
+The R-Squared is 0.59. This means that around 60% of the variation in the dependent variable is explained by the independent variable.   
+`p-Value` < 2.2e-16 - We can consider a linear model to be statistically significant only when the `p-Value` is less that the statistical significance level, which is 0.05.  
   
-we have two assumptions about the regression model:  
-* residuals are homoscedastic - if the data homoscedastic we shouldn't see any   connection between the points.  
-* residuals are distributed normally- If the data are exactly normal, we expect the   points to lie on a straight line on the QQ graph.  
+We have two assumptions about the regression model:  
+* Residuals are homoscedastic - if the data homoscedastic we shouldn't see any   connection between the points.  
+* Residuals are distributed normally- If the data are exactly normal, we expect the   points to lie on a straight line on the QQ graph.  
 
 
 ```{r residuals}
@@ -399,17 +393,17 @@ labs(title="Residual Plot")
 
 #### conclusion
 
-* The Residuals Plot shows homoscedastic.
-* our QQ plot shows that our residuals are distributed normal.
+* The Residuals Plot shows homoscedasticity.
+* our QQ plot shows that our residuals are distributed normally.
 
-To sum up this results we can determine there is a linear correlation between score and Healthy life expectancy.
+This results we can determine there is a linear correlation between score and Healthy life expectancy.
 
 
 
 ## 1.2 Connection between region and score
   
   
-How dows the area you live in will effect your happiness ? 
+How does the area you live in effect your happiness ? 
 
 Let's see the score of the different regions: 
 ```{r region 1}
@@ -428,7 +422,7 @@ ggplot(mean_by_reg, aes(Region, score)) + geom_col(aes(fill = score), width = 0.
 
 ```
 
-Next, lets use  chi test to see if we can assume normal distribution at the world happiness score in 2021:
+Next, we use chi-squared test to see if we can assume normal distribution of world happiness score in 2021:
 
 ```{r region 2}
 
@@ -458,11 +452,11 @@ qchisq(p = 1-0.05, df = 5-2-1)
 
 ```
 
-Chi actual result is smaller than theoretical one ! it means we are going to accept the assumption that the world happiness distribution is normal.  
+The chi-squared test's actual result is smaller than theoretical one ! This means we are going to accept the assumption that the world happiness distribution is normal.  
   
   
-What we're now interesting in is weather western countries are happier than non-western countries.
-We can preform hypothesis testing to examine this.
+What we're now interested in is whether western countries are happier than non-western countries.
+We can perform hypothesis testing to examine this.
 
 $h_0$: Mean of western countries score equals to score's $\mu$ (expectation)  
 $h_1$: Mean of western countries score greater then score's $\mu$ (expectation)  
@@ -477,8 +471,8 @@ mu = mean(tidy21$score)
 t.test(x = west$score, alternative = "greater", mu = mu, conf.level = 0.99)
 ```
 
-`p-value` < 0.01. We here by reject $h_0$. Mean of western countries is greater then total mean.
-We were rign in 99% !
+`p-value` < 0.01. We here by reject $h_0$. Mean of western countries is greater than total mean.
+We were right in 99% !
 
 This is also noticeable in a boxplot:
 
@@ -497,30 +491,30 @@ tidy20 %>%
   
   
   
-# 2. Happiens over the years
+# 2. Happiness over the years
 
-## 2.1 Covid19 impact
+## 2.1 Covid-19 impact
  
-How is corona virus, that occurred in 2020,effected the post-covid happiness in 2021? Our hypothesis was that the pandemic decreased world happiness:
+How did corona virus pandemic, occurred in 2020, effect the post-covid happiness in 2021? We hypothesise that the pandemic has decreased world happiness:
    
-$h_{0}$: the world happiness was the same during 2019 (before) and 2021 (after)  
-$h_{1}$: world happiness was higher in 2019 than in 2021 - the corona virus caused the world happiness to descend  
+$h_{0}$: the world happiness was the same during 2019 (before) and 2021 (after).  
+$h_{1}$: world happiness was higher in 2019 than in 2021 - the corona virus caused the world happiness to decrease.    
   
 ```{r covid 1}
 t.test(x = score_yearly$score21 , y = score_yearly$score19 , paired = TRUE, alternative = "less")
 ```
 
-We can see `p-value` is very high. This means we cannot reject $h_0$.  
-To our suprise - The corona pandemic did not impact happiness like we thought.
+We can see that the `p-value` is very high. This means we cannot reject $h_0$.  
+To our surprise - The corona pandemic did not impact happiness like we thought.
 
-Lets take a look at the findings with boxplots:
+Let's take a look at the findings with boxplots:
 
 ```{r covid 2}
 entire_data %>% filter(year %in% c(19,21)) %>% ggplot(aes(y= score, x=factor(year) ,fill=factor(year)), color = year) + geom_boxplot() +
   ggtitle("Corona Happiness 2019 and 2021") + xlab("year") + theme(legend.position="none") 
 ```
 
-We can see that the mean of the happiness score is higher in 2021 than in 2019
+We can see that the mean happiness score is higher in 2021 than in 2019
 lets make a paird t-test to check it:
 
 ```{r }
@@ -539,31 +533,31 @@ To compare the happiness between the years, we started with a simple histogram -
 some_data %>% ggplot(aes(x=`score`, color=year)) + geom_density()
 ```
 
-it seems that the world is getting happier, higher scores are getting more common. let's see if we can see this effect in the mean score of every year:
+It seems that the world is getting happier, higher scores are getting more common. Let's see if we can see this effect in the mean score of every year:
 
 
 ```{r compare mean1 }
 entire_data %>% ggplot(aes(y=score, x=year))  + geom_boxplot()
 ```
 
-This is a bit crowded, lets go back to focus on 2015, 2018, 2021
+This is a bit crowded, let's again focus on 2015, 2018 and 2021
 
 
 ```{r compare mean2 }
 some_data %>% ggplot(aes(y=score, x=year,fill=year))  + geom_boxplot()
 ```
 
-This plot can show us three important things:  
+This plot shows us three important things:  
 1. `Mean` is higher in 2021  
 2. `Variance` is lower in 2021  
 3. `Mean` is higher in 2018 compared with 2015, but variance is the same  
   
 It does seem 2021 has been better, for most countries.  
-Generally, the world is getting happier and during the pandemic, this process accelerated !  
+Generally, the world is getting happier and during the pandemic, this process accelerated!  
   
-It might be the case that when things get tough, perception of happiness increases because our day to day trouble seem less significant.  
+One explanation for this might be that when things get tough, perception of happiness increases because our day to day troubles seem less significant.  
 
-Maybe we can isolate what in those years made people happier:
+Next, we try isolate what in those years made people happier:
 
 ### Happiness over the years - diffrent variables
 
@@ -580,25 +574,25 @@ some_data %>% ggplot(aes(x=gdp, y=score, color=year, shape=isIsrael))  +
 ```
 
 #### gdp and health
-These are absolute scales, however it seems the variance of them drastically decreased on 2021.
-Since it is of course unlikely that the population has started suddenly living more, we conclude our conversion of these variables (dividing by 100) was wrong.
+These are absolute scales, However it seems that their variance drastically decreased on 2021.
+Since it is of course unlikely that the population has started suddenly living longer, we conclude our conversion of these variables (dividing by 100) was wrong.
 We couldn't find a documentation explaining the different scales, and sadly this means we can not determine conclusions based on 2020's and 2021's `gdp` and `health`.
 
 #### freedom and trust
 
-As logic dictates, this variables are connected.  
-It seems that during the unprecedented global pandemic, government `trust` level and since of `freedom` **increased**.
+As logic dictates, these variables are connected.  
+It seems that during the unprecedented global pandemic, government `trust` level and sense of `freedom` **increased**.
 
-This is incredible - with government restrictions, limitations and conspiracy theories in mind. For some reason the citizens felt they can trust their leadership.
-The `freedom` spike might be connected to suffering from lock-downs and having them removed. Similar to the  jewish tail ["the rabbi, the farmer and the sheep"](http://www.morim.com/ravez2.pdf)
+Incredible, despite government restrictions, limitations and conspiracy theories in mind - citizens felt they can trust their leadership.
+The `freedom` spike might be connected to suffering from lock-downs and having them removed. Similar to the Jewish tale ["the rabbi, the farmer and the sheep"](http://www.morim.com/ravez2.pdf)
 
-This can begin to explain the mental state of the people of the different countries, leading happiness score to increase.
+This can begin to explain the mental state of the people in different countries, leading happiness score to increase.
 
 
 ## 2.3 Changes in Happiness per country
 
 
-In order to see improvments and declines in happiness for every country, we will introduce new variable - `diff`: diffrence in score over time
+In order to see improvements and declines in happiness for every country, we will introduce new variable - `diff`: difference in score over time
 
 ```{r diff prepare, message=FALSE, results="hide"}
 
@@ -629,9 +623,9 @@ diff21 = diff21 %>% mutate(diff.abs = abs(diff.total))
 
 ### results {.tabset}
 
-`diff18`: diffrence between score of 2015 and 2018  
-`diff21`: diffrence between score of 2018 and 2021   
-`diff.total`: diffrence between score of 2015 and 2021 
+`diff18`: difference between score of 2015 and 2018  
+`diff21`: difference between score of 2018 and 2021   
+`diff.total`: difference between score of 2015 and 2021 
 
 #### diff_data
 
@@ -646,18 +640,18 @@ diff_data
 ```
 
 
-This is how `diff.total` per country looks like, each point is the difference single country:
+This is how `diff.total` per country looks like, each point corresponds to a difference in score of a single country:
 
 ```{r diff result 2}
 diff21 %>% ggplot(aes(x=score, y=diff.total)) + geom_point() + geom_smooth()
 
 ```
 
-### Poor becamoe even poorer {.tabset}
+### Poor became even poorer {.tabset}
 
-It seems that as lower the happiness - the biggest the `diff`. pracicularly - the negative `diff`.
+It seems that the lower the happiness - the biggest the `diff`. particularly - the negative `diff`.
 
-To examine this. we will look at two plots - boxplot for `diff.total`, 
+To examine this, we will look at two plots - boxplot for `diff.total`, 
 and boxplot for `diff.abs`. The goal is to see both direction of the change and value of it.
 
 
@@ -705,15 +699,15 @@ diff21 %>% ggplot(aes(x=score_level, y=diff.abs, color=score_level)) + geom_boxp
 
 
 ### Results
-First, it is clear both that the difference for low-happiness countries is negative, while for medium and high, it is positive.  
+First, it is clear both that the difference for low-happiness countries is negative, and that for medium and high, it is positive.  
 
 Second, the score of happier countries tend to change less.
 
 
 
-# Conclusion
+# Conclusions
 
-We hope you enjoyed our research. We have answered many questions, and revoked others.  
+We hope you enjoyed our research. We have answered many questions, and invoked others.  
 We have learned that happiness is very hard to measure. And is extremely subjective.  
 We have also learned to never use "world happens report" data again, as it is not very tidy and poorly documented.
 
