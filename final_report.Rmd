@@ -185,7 +185,7 @@ glimpse(data21)
 |            |                                     | uble |          |
 +------------+-------------------------------------+------+----------+
 
-#### adjust scale and type of variables
+#### Adjust scale and type of variables
 
 ```{r adjust scale,  warning=FALSE}
 
@@ -299,7 +299,7 @@ some_data = bind_rows(tidy15,tidy18, tidy21)
 ```
 
 
-## results {.tabset}
+## Results {.tabset}
 
 here is the tidy data:
 
@@ -326,7 +326,7 @@ score_yearly
 
 why are some countries happier than others? 
 
-## 1.1 connection between diffrent variables and score
+## 1.1 Connection between diffrent variables and score
 
 
 ```{r linar all, message= FALSE, echo=FALSE,  ,out.width="50%"}
