@@ -27,13 +27,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-This article is a summery of our statistics project ([github
-link](https://github.com/MrPupik/StatisticsFinalProject/)), where we
-analyze the results of [world happiness
-reports (link)](https://worldhappiness.report/).
+This article is a summery of our statistics project <u> ([github
+link](https://github.com/MrPupik/StatisticsFinalProject/))</u>, where we
+analyze the results of <u>[world happiness
+reports (link)](https://worldhappiness.report/)</u>.
 In our research we focused on the years 2015 to 2021. The datasets we
-used can be found [here on
-Kaggle.](https://www.kaggle.com/mathurinache/world-happiness-report-20152021)
+used can be found <u>[here on
+Kaggle.](https://www.kaggle.com/mathurinache/world-happiness-report-20152021)</u>
 
 Since the data of each year came separately and included different
 categories and measurements, the first stage of our work is to **tidy
@@ -50,14 +50,14 @@ affects it and how. Questions we will focus on:
 #### 1. Why are some countries happier than others? What makes a country "happy"?
 
 -   The connection between `life expectancy` (*health*) and *score*.
-    Specificity, is the connection linear? (linear regression model)
+    Specificity, is the connection linear? (**linear regression model**)
 -   The connection between the `region or continent` (*region*) and
-    happiness (hypothesis testing, goodness of fit)
+    happiness (**hypothesis testing, goodness of fit**)
 
 #### 2. Happiness over the years
 
 -   Did Covid19 made our world sad? Comparison of 2019 and 2020
-    *scores*\
+    *scores*\ (**hypothesis testing, difference in means**)
 -   Which year was the happiest? Mean *score* over time.\
 -   Connection between `GDP per capita` (*gdp*) and happiness - all
     years combined.
@@ -625,7 +625,7 @@ diff21 = diff21 %>% mutate(diff.abs = abs(diff.total))
 
 `diff18`: difference between score of 2015 and 2018  
 `diff21`: difference between score of 2018 and 2021   
-`diff.total`: difference between score of 2015 and 2021 
+**diff.total**: a variable in `diff21` we'll be using. Holds the difference between score of 2015 and 2021 
 
 #### diff_data
 
@@ -638,7 +638,9 @@ diff_data
 ```{r diff result 10}
 diff_data
 ```
-
+  
+  
+### Poor became even poorer {.tabset}
 
 This is how `diff.total` per country looks like, each point corresponds to a difference in score of a single country:
 
@@ -647,7 +649,6 @@ diff21 %>% ggplot(aes(x=score, y=diff.total)) + geom_point() + geom_smooth()
 
 ```
 
-### Poor became even poorer {.tabset}
 
 It seems that the lower the happiness - the biggest the `diff`. particularly - the negative `diff`.
 
@@ -710,6 +711,7 @@ Second, the score of happier countries tend to change less.
 We hope you enjoyed our research. We have answered many questions, and invoked others.  
 We have learned that happiness is very hard to measure. And is extremely subjective.  
 We have also learned to never use "world happens report" data again, as it is not very tidy and poorly documented.
-
-
+  
+  
+  
 > <img src="resources/dolls.jpg"/>
