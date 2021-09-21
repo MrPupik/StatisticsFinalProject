@@ -1,4 +1,4 @@
-# WorldHappinessAnalysis
+# World Happiness Analysis data science project
 Data science project of a TAU statistics course 
 
 
